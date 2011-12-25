@@ -240,3 +240,17 @@ function qw_get_meta_keys() {
 
 	return $keys;
 }
+
+/*
+ * Function to retrieve available post_status options for exposed filters
+ *
+ *
+ */
+function qw_get_post_status_options() {
+	global $wpdb;
+	if(!$options = wp_cache_get("qw_post_status_options",'posts')) {
+		$options = $wpdb->get_col("SELECT DISTINCT post_status FROM $wpdb->posts WHERE 1=1");
+		wp_cache_set("qw_post_status_options",$options,'posts', 60 * 60 * 7);
+	}
+	return apply_filters('qw_post_status_options', $options);
+}

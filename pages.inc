@@ -83,12 +83,16 @@ function qw_query_pages_handler()
     // We'll need to override query options
     $options_override = array();
     
+    $dirty_path = parse_url($_SERVER['REQUEST_URI']);  
+    $query_str = $dirty_path['query'];
+    
     // Look at the requested uri w/o paginiation involved
-    $dirty_path = explode('/page/', $_SERVER['REQUEST_URI']);
+    $dirty_path = explode('/page/', $dirty_path['path']);
+
     
     // Clean the result for DB
     $path = $wpdb->escape($dirty_path[0]);
-    
+
     // fix the query paging
     if(isset($dirty_path[1])){
       $paged = explode("/", $dirty_path[1]);
@@ -121,7 +125,7 @@ function qw_query_pages_handler()
       } else {
         $alt_path = substr($path, 0, strlen($path)-1);
       }
-      
+
       // Look for the query path given
       $table_name = $wpdb->prefix."query_wrangler";
       $sql = "SELECT id,name,path,data FROM ".$table." WHERE type = 'page' AND (path = '".$path."' OR path = '".$alt_path."')";

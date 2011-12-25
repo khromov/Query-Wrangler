@@ -446,6 +446,7 @@
             // loop through existing filters
             foreach($qw_query_options['args']['filters'] as $filter_name => $filter_settings)
             {
+            	
               $filter = $filters[$filter_settings['type']];
               $args = array(
                 'filter_name' => $filter_name,
@@ -456,6 +457,7 @@
                 'post_types' => qw_all_post_types(),
                 'category_ids' => get_all_category_ids(),
                 'tags' => get_tags(array('hide_empty' => false)),
+                'exposed'=> $filter_settings['exposed']
               );
               print theme('query_filter', $args);
             }

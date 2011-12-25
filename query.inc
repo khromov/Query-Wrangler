@@ -16,13 +16,12 @@ function qw_execute_query($query_id, $options_override = array(), $reset_post_da
   
   // get the query options
   $options = qw_generate_query_options($query_id, $options_override);
-  
   // get formatted query arguments
   $args = qw_generate_query_args($options);
   
   // set the new query
   $wp_query = new WP_Query($args);
-  
+
   // get the themed content
   $themed = qw_template_query($wp_query, $options);
   
@@ -88,6 +87,7 @@ function qw_generate_query_args($options = array(), $options_override = array())
   
   // handle filters
   if(is_array($options['args']['filters'])){
+
     foreach($options['args']['filters'] as $filter)
     {
       if($filter['type'] == 'categories'){
@@ -113,6 +113,14 @@ function qw_generate_query_args($options = array(), $options_override = array())
     }
   }
   
+  //if exposed filters are allowed override the query vars
+  if(!empty($options['display']['exposed_filters'])) {
+  	foreach($options['display']['exposed_filters'] as $exposed_filter) {
+  		if(isset($_REQUEST[$exposed_filter])) {
+  			$args[$exposed_filter] = esc_attr($_REQUEST[$exposed_filter]);
+  		}
+  	}
+  }
   return $args;
 }
 
@@ -208,3 +216,7 @@ function qw_cmp($a,$b) {
   if ($a['weight'] == $b['weight']) return 0;
   return ($a['weight'] < $b['weight'])? -1 : 1;
 }
+
+/*
+ * Generate Exposed Filters
+ */

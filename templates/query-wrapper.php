@@ -15,7 +15,7 @@
         <?php print $header; ?>
       </div>
     <?php } ?>
-    
+    <?php echo $exposed_filters; ?>
     <div class="query-content">
       <?php print $content; ?>
       <?php if (isset($pager)) { ?>

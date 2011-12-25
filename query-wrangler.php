@@ -377,12 +377,23 @@ function qw_edit_query_form()
       $edit_args['page_templates'] = get_page_templates();
     }
     
+    
+    $display = unserialize($row->data);
+    
+    foreach($edit_args['qw_query_options']['args']['filters'] as $set_filter) {
+    	if(isset($display['display']['exposed_filters'][$set_filter['type']])) {
+    		$edit_args['qw_query_options']['args']['filters'][$set_filter['type']]['exposed'] = 1;
+    	}
+    }
+    
+//    print_r($edit_args);
     // admin wrapper arguments
     $admin_args = array(
       'title' => 'Edit query <em>'.$edit_args['query_name'].'</em>',
       // content is the query_edit page
-      'content' => theme('query_edit', $edit_args)
+      'content' => theme('query_edit', $edit_args),
     );
+
     
     // add view link for pages
     if($row->type == 'page' && isset($row->path)){

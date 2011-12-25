@@ -171,6 +171,19 @@ function tw_admin_page_wrapper($templates)
     ),
   );
   
+  $templates['exposed_filters'] = array(
+  	'files'=> array(
+  		'templates/exposed-filters.php',
+  		'exposed-filters.php'
+  	),
+  	'default_path'=>dirname(__FILE__),
+  	'arguments'=>array(
+  		'filters'=>array(),
+  		'label'=>__('Filters','qw-lang'),
+  		'testing'=>'mikes test'
+  		)
+  	);
+  
   return $templates;
 }
 add_filter('tw_templates', 'tw_admin_page_wrapper');

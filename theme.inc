@@ -93,7 +93,7 @@ function qw_template_query($wp_query, $options)
 {
   $results_count = count($wp_query->posts);
   $content = '';
-  
+
   // start building theme arguments  
   $wrapper_args = array(
     'slug' => $options['meta']['slug'],
@@ -159,7 +159,13 @@ function qw_template_query($wp_query, $options)
   if($options['meta']['footer'] != '') {
     $wrapper_args['footer'] = $options['meta']['footer'];
   }
-    
+  
+  // exposed filters
+  if(!empty($options['display']['exposed_filters'])) {
+  	$wrapper_args['exposed_filters'] = qw_make_filters($options['display']['exposed_filters'], $options);
+  }
+  
+  
   // pagination
   if($options['meta']['pagination'] && isset($options['display']['page']['pager']['active'])){
     $pager_classes = array();
@@ -169,7 +175,6 @@ function qw_template_query($wp_query, $options)
     // pager
     $wrapper_args['pager'] = qw_make_pager($options['display']['page']['pager'], $wp_query);
   }
-   
   // template with wrapper
   return theme('query_display_wrapper', $wrapper_args); 
 }
@@ -305,6 +310,37 @@ function qw_make_fields_rows($new_query, $display)
   }
   
   return $rows;
+}
+
+
+/*
+ * Make Filters
+ * @filters array $filters Query pager details
+ * @options array  
+ * @return HTML processed toggle filter
+ */
+
+function qw_make_filters($filters,$options) {
+	$themed_filters = '';
+	$filter_args = array(); 
+	if(!empty($filters)) {
+		foreach($filters as $type) {
+			switch($type) {
+				case "post_status": 
+					$filter_args['filters'][$type] = array(
+						'name'=>'post_status',
+						'select_label'=>__("Post Status",'query-wrangler'),
+						'options' => qw_get_post_status_options()
+					);
+				break; 
+			}
+		}
+	$themed_filters = theme('exposed_filters',$filter_args);
+	} else {
+		$themed_filters = false;
+	}
+
+	return $themed_filters;
 }
 
 /*
