@@ -325,15 +325,37 @@ function qw_make_filters($filters,$options) {
 	$filter_args = array(); 
 	if(!empty($filters)) {
 		foreach($filters as $type) {
+			
 			switch($type) {
 				case "post_status": 
 					$filter_args['filters'][$type] = array(
 						'name'=>'post_status',
 						'select_label'=>__("Post Status",'query-wrangler'),
-						'options' => qw_get_post_status_options()
+						'options' => qw_get_post_status_options(),
+						'default' => $options['args']['filters']['post_status']['post_status']
 					);
 				break; 
+				
+				case "post_types":
+					$filter_args['filters'][$type] = array(
+						'name' =>'post_types',
+						'select_label'=>__('Post Type', 'query-wrangler'),
+						'options'	=> get_post_types(),
+						'default' => $options['args']['filters']['post_types']['post_types']
+					);
+				break;
+				
+				case "categories":
+					$filter_args['filters'][$type] = array(
+						'name' => 'categories',
+						'select_label'=>__('Category','query-wranlger'),
+						'options'=> qw_get_taxonomy_options('category'),
+						'default' => $options['args']['filters']['categories']['categories']
+					);
+				break;
+				
 			}
+			
 		}
 	$themed_filters = theme('exposed_filters',$filter_args);
 	} else {

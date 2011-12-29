@@ -252,5 +252,19 @@ function qw_get_post_status_options() {
 		$options = $wpdb->get_col("SELECT DISTINCT post_status FROM $wpdb->posts WHERE 1=1");
 		wp_cache_set("qw_post_status_options",$options,'posts', 60 * 60 * 7);
 	}
-	return apply_filters('qw_post_status_options', $options);
+	$result = array();
+	foreach($options as $option) {
+		$result[$option] = $option;
+	}
+	return apply_filters('qw_post_status_options', $result);
+}
+
+
+function qw_get_taxonomy_options($taxonomy) {
+	$terms = get_terms($taxonomy,'orderby=name');
+	$options = array();
+	foreach($terms as $term) {
+		$options[$term->term_id] = $term->name;
+	}
+	return $options;
 }

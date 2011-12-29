@@ -90,7 +90,7 @@ function qw_generate_query_args($options = array(), $options_override = array())
 
     foreach($options['args']['filters'] as $filter)
     {
-      if($filter['type'] == 'categories'){
+      if($filter['type'] == 'categories' AND !empty($filter['cats'])){
         if($filter['cat_operator'] == 'cat'){
           $args[$filter['cat_operator']] = implode(",", array_keys($filter['cats']));
         }
@@ -117,7 +117,14 @@ function qw_generate_query_args($options = array(), $options_override = array())
   if(!empty($options['display']['exposed_filters'])) {
   	foreach($options['display']['exposed_filters'] as $exposed_filter) {
   		if(isset($_REQUEST[$exposed_filter])) {
-  			$args[$exposed_filter] = esc_attr($_REQUEST[$exposed_filter]);
+  			if($exposed_filter == 'post_types') {
+  				$args['post_type'] = esc_attr($_REQUEST[$exposed_filter]);
+  			} elseif($exposed_filter == 'categories') {
+  				$args['cat'] = esc_attr($_REQUEST[$exposed_filter]);
+  			} else {
+  				$args[$exposed_filter] = array(esc_attr($_REQUEST[$exposed_filter]));
+  			}
+  			
   		}
   	}
   }
