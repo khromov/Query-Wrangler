@@ -127,6 +127,14 @@ function qw_generate_query_args($options = array(), $options_override = array())
         $args[$sort['orderby_key']] = $sort['type'];
         $args[$sort['order_key']] = $sort['order_value'];
       }
+
+      // exposed sorts
+      if(isset($sort['exposed_process']) && function_exists($sort['exposed_process'])){
+        if(empty($sort['exposed_key'])){
+          $sort['exposed_key'] = 'exposed_'.$sort['name'];
+        }
+        $sort['exposed_process']($args, $sort);
+      }
     }
   }
 
@@ -147,6 +155,14 @@ function qw_generate_query_args($options = array(), $options_override = array())
       } else {
         // else, default to type as WP_Query argument key
         $args[$filter['type']] = $filter[$filter['type']];
+      }
+
+      // exposed filters
+      if(isset($filter['exposed_process']) && function_exists($filter['exposed_process'])){
+        if(empty($filter['exposed_key'])){
+          $filter['exposed_key'] = 'exposed_'.$filter['name'];
+        }
+        $filter['exposed_process']($args, $filter);
       }
     }
   }

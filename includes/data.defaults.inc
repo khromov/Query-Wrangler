@@ -79,9 +79,7 @@ function qw_default_row_styles($row_styles){
 add_filter('qw_row_styles', 'qw_default_row_styles', 0);
 
 function qw_row_style_posts_settings()
-{
-  ob_start();
-  ?>
+{ ?>
     <p class="description">Select the amount of the post to be shown.</p>
     <select class="qw-title-ignore"
             name="qw-query-options[display][post_settings][size]">
@@ -95,7 +93,6 @@ function qw_row_style_posts_settings()
       </option>
     </select>
   <?php
-  return ob_get_clean();
 }
 
 

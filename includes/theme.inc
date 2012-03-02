@@ -172,10 +172,6 @@ function theme_query_display_rows_preprocess($template)
       $style = $all_styles[$template['arguments']['style']];
       $template['default_path'] = $style['default_path'];
     }
-
-    //if(isset($all_styles[$template['preprocess_callback']])){
-    //  $template['preprocess_callback'] = $all_styles[$template['preprocess_callback']];
-    //}
   }
   return $template;
 }
@@ -260,11 +256,117 @@ function qw_template_query(&$wp_query, $options)
     $wrapper_args['pager'] = qw_make_pager($options['display']['page']['pager'], $wp_query);
   }
 
+  $exposed = qw_generate_exposed_handlers($options);
+  if(count($exposed) > 0){
+    $wrapper_args['exposed'] =  $exposed;
+  }
+
   // template with wrapper
   return theme('query_display_wrapper', $wrapper_args);
 }
 /*
- *
+ * Process and theme exposed handlers
+ */
+function qw_generate_exposed_handlers($options){
+  if ($exposed = qw_process_exposed_handlers($options)){
+    $output = array('sorts' => '', 'filters' => '');
+    // loop through sorts and filters
+    if(is_array($exposed['sorts'])){
+      // loop through each exposed item
+      foreach($exposed['sorts'] as $name => $item){
+        // show the exposed form
+        if (function_exists($item['exposed_form'])){
+          $item['name'] = $name;
+          $output['sorts'].=  qw_theme_single_exposed_handler($item);
+        }
+      }
+    }
+
+    // loop through sorts and filters
+    if(is_array($exposed['filters'])){
+      // loop through each exposed item
+      foreach($exposed['filters'] as $name => $item){
+        // show the exposed form
+        if (function_exists($item['exposed_form'])){
+          $item['name'] = $name;
+          $output['filters'].=  qw_theme_single_exposed_handler($item);
+        }
+      }
+    }
+
+    return $output;
+  }
+}
+/*
+ * Single exposed handler wrapper html
+ */
+function qw_theme_single_exposed_handler($item){
+  if(empty($item['exposed_key'])){
+    $item['exposed_key'] = 'exposed_'.$item['name'];
+  }
+  ob_start();
+  ?>
+    <div class="query-exposed-<?php print $item['name']; ?>">
+      <?php if (!empty($item['values']['exposed_label'])) { ?>
+        <label class="query-exposed-label query-exposed-label-<?php print $item['name']; ?>">
+          <?php print $item['values']['exposed_label']; ?>
+        </label>
+      <?php } ?>
+      <!-- exposed-<?php print $item['name']; ?> -->
+      <?php $item['exposed_form']($item); ?>
+
+      <?php if (!empty($item['values']['exposed_desc'])) { ?>
+        <div class="query-exposed-description query-exposed-description-<?php print $item['name']; ?>">
+          <?php print $item['values']['exposed_label']; ?>
+        </div>
+      <?php } ?>
+    </div>
+  <?php
+  return ob_get_clean();
+}
+/*
+ * Look for and prepare exposed handlers
+ */
+function qw_process_exposed_handlers($options){
+  // look for exposed filters or sorts
+  if(is_array($options['args']['sorts'])){
+    $all_sorts = qw_all_sort_options();
+    $exposed_sorts = array();
+    foreach($options['args']['sorts'] as $name => $sort) {
+      if ($sort['is_exposed']){
+        $exposed_sorts[$name] = $all_sorts[$sort['hook_key']];
+        $exposed_sorts[$name]['values'] = $sort;
+      }
+    }
+  }
+  if(is_array($options['args']['filters'])){
+    $exposed_filters = array();
+    $all_filters = qw_all_filters();
+    foreach($options['args']['filters'] as $name => $filter) {
+      if ($filter['is_exposed']){
+        $exposed_filters[$name] = $all_filters[$filter['hook_key']];
+        $exposed_filters[$name]['values'] = $filter;
+      }
+    }
+  }
+
+  $exposed = array();
+  if (count($exposed_filters) > 0){
+    do_action_ref_array('qw_process_exposed_filters', array(&$exposed_filters));
+    $exposed['filters'] = $exposed_filters;
+  }
+  if (count($exposed_sorts) > 0){
+    do_action_ref_array('qw_process_exposed_sorts', array(&$exposed_sorts));
+    $exposed['sorts'] = $exposed_sorts;
+  }
+
+  if (count($exposed) > 0){
+    return $exposed;
+  }
+  return false;
+}
+/*
+ * Create rows for Posts row_style query
  */
 function qw_make_posts_rows(&$wp_query, $options){
   $rows = array();

@@ -98,7 +98,7 @@ function qw_all_sort_options(){
     // maintain hook's key
     $sort_options[$type]['hook_key'] = $type;
   }
-  
+
   // sort them by title
   $titles = array();
   foreach ($sort_options as $key => $sort) {

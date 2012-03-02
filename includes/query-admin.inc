@@ -363,7 +363,9 @@ function qw_preprocess_handlers($type, $handlers){
 
       // this handler's form
       if (function_exists($this_handler['form_callback'])){
-        $this_handler['form'] = $this_handler['form_callback']($this_handler);
+        ob_start();
+          $this_handler['form_callback']($this_handler);
+        $this_handler['form'] = ob_get_clean();
       }
       // provide template wrangler support
       else if (isset($this_handler['form_template'])){

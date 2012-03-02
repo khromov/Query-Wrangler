@@ -104,9 +104,7 @@ add_filter('qw_sort_options', 'qw_default_sort_options');
  * Default sort options 'order' options form
  */
 function qw_form_default_sort_order_options($sort)
-{
-  ob_start();
-  ?>
+{ ?>
     <!-- sort options -->
     <label class="qw-label">Order by <?php print $sort['title']; ?>:</label>
     <select name="<?php print $sort['form_prefix']; ?>[order_value]">
@@ -123,5 +121,4 @@ function qw_form_default_sort_order_options($sort)
     </select>
     <p class="description">Select how to order the results.</p>
   <?php
-  return ob_get_clean();
 }

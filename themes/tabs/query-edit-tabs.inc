@@ -80,7 +80,7 @@ $display = array_map( 'stripslashes_deep', $display );
                 { ?>
                   <div class="qw-form">
                     <?php
-                      print $basic['form_callback']($basic, $options[$basic['option_type']]);
+                      $basic['form_callback']($basic, $options[$basic['option_type']]);
                     ?>
                   </div>
                   <?php
@@ -107,7 +107,7 @@ $display = array_map( 'stripslashes_deep', $display );
                 { ?>
                   <div class="qw-form">
                     <?php
-                      print $basic['form_callback']($basic, $options[$basic['option_type']]);
+                      $basic['form_callback']($basic, $options[$basic['option_type']]);
                     ?>
                   </div>
                   <?php

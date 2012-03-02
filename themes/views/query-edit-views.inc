@@ -249,7 +249,7 @@ $display = array_map( 'stripslashes_deep', $display );
           { ?>
             <div id="qw-<?php print $basic['hook_key']; ?>" class="qw-item-form">
               <?php
-                print $basic['form_callback']($basic, $options[$basic['option_type']]);
+                $basic['form_callback']($basic, $options[$basic['option_type']]);
               ?>
             </div>
             <?php

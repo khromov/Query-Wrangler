@@ -1,4 +1,6 @@
 <?php
+// http://codex.wordpress.org/Function_Reference/get_taxonomies
+
 /*
  * Default Filters
  *
@@ -32,6 +34,21 @@
     // determines how form data becomes WP_Query arguments
     // defaults to form key as WP_Query argument key
     'query_args_callback' => 'qw_generate_query_args_post_types',
+
+    // (optional) process the exposed filter's values into the query args
+    // @param &$args - the arguments for the WP_Query
+    // @param $filter -
+    'exposed_process' => 'qw_filter_exposed_process_post_id',
+
+    // (optional) a form for gather settings for the exposed filter
+    // expects html output
+    // @param $filter
+    'exposed_settings_form' => 'qw_filter_exposed_settings_form_post_id',
+
+    // (optional) the form exposed to a user above the query
+    //  expects html output
+    // @param $filter -
+    'exposed_form' => 'qw_filter_exposed_form_post_id',
   );
 
  */
@@ -56,6 +73,10 @@ function qw_default_filters($filters){
     'form_callback' => 'qw_filter_post_id',
     'query_args_callback' => 'qw_generate_query_args_post_id',
     'query_display_types' => array('page','widget','override'),
+    // exposed
+    'exposed_process' => 'qw_filter_exposed_process_post_id',
+    'exposed_settings_form' => 'qw_filter_exposed_settings_form_post_id',
+    'exposed_form' => 'qw_filter_exposed_form_post_id',
   );
   $filters['categories'] = array(
     'title' => 'Categories',
@@ -77,6 +98,10 @@ function qw_default_filters($filters){
     'form_callback' => 'qw_filter_meta_key_value',
     'query_args_callback' => 'qw_generate_query_args_meta_key_value',
     'query_display_types' => array('page','widget','override'),
+    // exposed
+    'exposed_process' => 'qw_filter_exposed_process_meta_key_value',
+    'exposed_settings_form' => 'qw_filter_exposed_settings_form_meta_key_value',
+    'exposed_form' => 'qw_filter_exposed_form_meta_key_value',
   );
   $filters['meta_key'] = array(
     'title' => 'Meta Key',
@@ -84,6 +109,10 @@ function qw_default_filters($filters){
     'form_callback' => 'qw_filter_meta_key',
     'query_args_callback' => 'qw_generate_query_args_meta_key',
     'query_display_types' => array('page','widget','override'),
+    // exposed
+    'exposed_process' => 'qw_filter_exposed_process_meta_key',
+    'exposed_settings_form' => 'qw_filter_exposed_settings_form_meta_key',
+    'exposed_form' => 'qw_filter_exposed_form_meta_key',
   );
   $filters['meta_value'] = array(
     'title' => 'Meta Value',
@@ -91,12 +120,71 @@ function qw_default_filters($filters){
     'form_callback' => 'qw_filter_meta_value',
     'query_args_callback' => 'qw_generate_query_args_meta_value',
     'query_display_types' => array('page','widget','override'),
+    // exposed
+    'exposed_process' => 'qw_filter_exposed_process_meta_value',
+    'exposed_settings_form' => 'qw_filter_exposed_settings_form_meta_value',
+    'exposed_form' => 'qw_filter_exposed_form_meta_value',
   );
   return $filters;
 }
 // add default filters to the filter
 add_filter('qw_filters', 'qw_default_filters');
 
+/*
+ * Post IDs exposed
+ */
+function qw_filter_exposed_process_post_id(&$args, $filter){
+  $values = $_GET[$filter['exposed_key']];
+  if(!empty($values)){
+    $args[$filter['compare']] = explode(",", $values);
+  }
+}
+function qw_filter_exposed_form_post_id($filter)
+{ ?>
+  <input type="text"
+         name="<?php print $filter['exposed_key']; ?>"
+         value="<?php print $_GET[$filter['exposed_key']]; ?>" />
+  <?php
+}
+function qw_filter_exposed_settings_form_post_id($filter){}
+
+/*
+ * Meta values exposed
+ */
+function qw_filter_exposed_process_meta_value(&$args, $filter){
+  $values = $_GET[$filter['exposed_key']];
+  if(!empty($values)){
+    $args[$filter['compare']] = explode(",", $values);
+  }
+}
+function qw_filter_exposed_form_meta_value($filter)
+{ ?>
+  <input type="text"
+         name="<?php print $filter['exposed_key']; ?>"
+         value="<?php print $_GET[$filter['exposed_key']]; ?>" />
+  <?php
+}
+function qw_filter_exposed_settings_form_meta_value($filter){}
+
+/*
+ * Meta key exposed
+ */
+function qw_filter_exposed_process_meta_key(&$args, $filter){
+  $values = $_GET[$filter['exposed_key']];
+  if(!empty($values)){
+    $args[$filter['compare']] = $values;
+  }
+}
+function qw_filter_exposed_form_meta_key($filter)
+{ ?>
+  <input type="text"
+         name="<?php print $filter['exposed_key']; ?>"
+         value="<?php print $_GET[$filter['exposed_key']]; ?>" />
+  <?php
+}
+function qw_filter_exposed_settings_form_meta_key($filter){}
+
+/************************************************************************************************
 /*
  * Filter's query_args_callbacks
  * These functions convert form data into WP_Query arguments
@@ -148,9 +236,7 @@ function qw_generate_query_args_meta_value(&$args, $filter){
  * - checkboxes
  */
 function qw_filter_post_types($filter)
-{
-  ob_start();
-  ?>
+{ ?>
   <div class="qw-checkboxes">
     <?php
       $post_types = qw_all_post_types();
@@ -171,7 +257,6 @@ function qw_filter_post_types($filter)
     ?>
   </div>
   <?php
-  return ob_get_clean();
 }
 
 /*
@@ -179,9 +264,7 @@ function qw_filter_post_types($filter)
  * - text, select
  */
 function qw_filter_post_id($filter)
-{
-  ob_start();
-  ?>
+{ ?>
     <input type='text' name="<?php print $filter['form_prefix']; ?>[post_ids]" value='<?php print $filter['values']['post_ids']; ?>' />
     <p class="description">How to treat these post IDs.</p>
 
@@ -192,7 +275,6 @@ function qw_filter_post_id($filter)
       </select>
     </p>
   <?php
-  return ob_get_clean();
 }
 
 /*
@@ -200,15 +282,12 @@ function qw_filter_post_id($filter)
  * - text
  */
 function qw_filter_post_parent($filter)
-{
-  ob_start();
-  ?>
+{ ?>
   <input class="qw-field-value"
          type="text"
          name="<?php print $filter['form_prefix']; ?>[post_parent]"
          value="<?php print $filter['values']['post_parent']; ?>" />
   <?php
-  return ob_get_clean();
 }
 
 /*
@@ -216,9 +295,7 @@ function qw_filter_post_parent($filter)
  * - checkboxes, select
  */
 function qw_filter_categories($filter)
-{
-  ob_start();
-  ?>
+{ ?>
   <div class="qw-checkboxes">
     <?php
       $category_ids = get_all_category_ids();
@@ -247,7 +324,6 @@ function qw_filter_categories($filter)
     <option value="category__not_in" <?php if($filter['values']['cat_operator'] == "category__not_in") {print 'selected="selected"';} ?>>Not in the categories selected</option>
   </select>
   <?php
-  return ob_get_clean();
 }
 
 /*
@@ -255,9 +331,7 @@ function qw_filter_categories($filter)
  * - checkboxes, select
  */
 function qw_filter_tags($filter)
-{
-  ob_start();
-  ?>
+{ ?>
   <div class="qw-checkboxes">
     <?php
       $tags = get_tags(array('hide_empty' => false));
@@ -283,7 +357,6 @@ function qw_filter_tags($filter)
     <option value="tag__not_in">None of the selected tags</option>
   </select>
   <?php
-  return ob_get_clean();
 }
 
 /*
@@ -291,9 +364,7 @@ function qw_filter_tags($filter)
  * - text, select, text
  */
 function qw_filter_meta_key_value($filter)
-{
-  ob_start();
-  ?>
+{ ?>
     <label class="qw-label">Meta Key:</label>
     <input type='text' name="<?php print $filter['form_prefix']; ?>[meta_key]" value='<?php print $filter['values']['meta_key']; ?>' />
 
@@ -314,7 +385,6 @@ function qw_filter_meta_key_value($filter)
                 class="qw-meta-value"><?php print stripcslashes($filter['values']['meta_value']); ?></textarea>
     </p>
   <?php
-  return ob_get_clean();
 }
 
 /*
@@ -322,14 +392,11 @@ function qw_filter_meta_key_value($filter)
  * - text
  */
 function qw_filter_meta_key($filter)
-{
-  ob_start();
-  ?>
+{ ?>
     <input type='text'
            name="<?php print $filter['form_prefix']; ?>[meta_key]"
            value='<?php print $filter['values']['meta_key']; ?>' />
   <?php
-  return ob_get_clean();
 }
 
 /*
@@ -337,11 +404,8 @@ function qw_filter_meta_key($filter)
  * - text
  */
 function qw_filter_meta_value($filter)
-{
-  ob_start();
-  ?>
+{ ?>
     <textarea name="<?php print $filter['form_prefix']; ?>[meta_value]"
               class="qw-meta-value"><?php print stripcslashes($filter['values']['meta_value']); ?></textarea>
   <?php
-  return ob_get_clean();
 }

@@ -80,6 +80,7 @@ label.qw-label {
   padding-bottom: 12px;
   margin-bottom: 12px;
   border-bottom: 1px solid #bbb;
+  clear: left;
 }
 .qw-setting-header {
   display: block;

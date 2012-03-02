@@ -178,33 +178,31 @@ function qw_field_author($field)
     'ID' => 'Author ID',
   );
   $link_selected = ($field['values']['link_to_author']) ? 'checked="checked"' : '';
-  ob_start();
   ?>
-      <label class="qw-label">Author Field Settings:</label>
+    <label class="qw-label">Author Field Settings:</label>
 
-      <select name="<?php print $field['form_prefix']; ?>[output_type]">
-        <?php
-          foreach($options as $value => $title)
-          { ?>
-            <option value="<?php print $value; ?>"
-                    <?php print ($field['values']['output_type'] == $value) ? 'selected="selected"' : ''; ?>>
-              <?php print $title; ?>
-            </option>
-            <?php
-          }
-        ?>
-      </select>
+    <select name="<?php print $field['form_prefix']; ?>[output_type]">
+      <?php
+        foreach($options as $value => $title)
+        { ?>
+          <option value="<?php print $value; ?>"
+                  <?php print ($field['values']['output_type'] == $value) ? 'selected="selected"' : ''; ?>>
+            <?php print $title; ?>
+          </option>
+          <?php
+        }
+      ?>
+    </select>
 
-      <p>
-        <label class='qw-field-checkbox'>
-          <input type='checkbox'
-                 name='<?php print $field['form_prefix']; ?>[link_to_author]'
-                 <?php print $link_selected; ?> />
-          Link to author page (list of author posts)
-        </label>
-      </p>
+    <p>
+      <label class='qw-field-checkbox'>
+        <input type='checkbox'
+               name='<?php print $field['form_prefix']; ?>[link_to_author]'
+               <?php print $link_selected; ?> />
+        Link to author page (list of author posts)
+      </label>
+    </p>
   <?php
-  return ob_get_clean();
 }
 /*
  * Avatar output callback
@@ -227,7 +225,6 @@ function qw_field_author_avatar($field)
 {
   $image_sizes = get_intermediate_image_sizes();
   $link_selected = ($field['values']['link_to_author']) ? 'checked="checked"' : '';
-  ob_start();
   ?>
     <label class="qw-label">Avatar Size: </label>
     <input type="text"
@@ -243,7 +240,6 @@ function qw_field_author_avatar($field)
     </label>
   </p>
   <?php
-  return ob_get_clean();
 }
 
 /*
@@ -252,7 +248,6 @@ function qw_field_author_avatar($field)
 function qw_form_image_attachment($field)
 {
   $image_sizes = get_intermediate_image_sizes();
-  ob_start();
   ?>
     <!-- image display -->
     <label class="qw-label">Number of items to show:</label>
@@ -276,7 +271,6 @@ function qw_form_image_attachment($field)
       </select>
     </p>
   <?php
-  return ob_get_clean();
 }
 /*
  * File attachment settings
@@ -284,29 +278,27 @@ function qw_form_image_attachment($field)
 function qw_form_file_attachment($field)
 {
   $file_styles = qw_all_file_styles();
-  ob_start();
   ?>
     <!-- file display -->
-      <label class="qw-label">Number of items to show:</label>
-      <input class="qw-text-short qw-title-ignore"
-             type="text"
-             name='<?php print $field['form_prefix']; ?>[file_display_count]'
-             value="<?php print ($field['values']['file_display_count']) ? $field['values']['file_display_count']: 0;?>" />
+    <label class="qw-label">Number of items to show:</label>
+    <input class="qw-text-short qw-title-ignore"
+           type="text"
+           name='<?php print $field['form_prefix']; ?>[file_display_count]'
+           value="<?php print ($field['values']['file_display_count']) ? $field['values']['file_display_count']: 0;?>" />
 
-      <p>
-        <label class="qw-label">File Display Style:</label>
-        <select name='<?php print $field['form_prefix']; ?>[file_display_style]'>
-          <?php
-            foreach($file_styles as $key => $file_style_details)
-            {
-              $style_selected = ($field['values']['file_display_style'] == $key) ? 'selected="selected"' : '';
-              ?>
-                <option value="<?php print $key; ?>" <?php print $style_selected; ?>><?php print $file_style_details['description']; ?></option>
-              <?php
-            }
-          ?>
-        </select>
-      </p>
-    <?php
-  return ob_get_clean();
+    <p>
+      <label class="qw-label">File Display Style:</label>
+      <select name='<?php print $field['form_prefix']; ?>[file_display_style]'>
+        <?php
+          foreach($file_styles as $key => $file_style_details)
+          {
+            $style_selected = ($field['values']['file_display_style'] == $key) ? 'selected="selected"' : '';
+            ?>
+              <option value="<?php print $key; ?>" <?php print $style_selected; ?>><?php print $file_style_details['description']; ?></option>
+            <?php
+          }
+        ?>
+      </select>
+    </p>
+  <?php
 }
