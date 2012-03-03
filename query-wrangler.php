@@ -38,6 +38,18 @@ define('QW_DEFAULT_THEME', 'views');
 // Query Widget
 include_once QW_PLUGIN_DIR.'/widget.query.php';
 
+if (!is_admin()){
+  add_action('init', 'qw_init');
+}
+add_action('admin_init', 'qw_init', 900);
+add_action('admin_init', 'qw_check_version', 901);
+add_action('admin_head', 'qw_admin_css');
+
+// add menu very last so we don't get replaced by another menu item
+add_action( 'admin_menu', 'qw_menu', 9999);
+add_shortcode('query','qw_single_query_shortcode');
+
+
 /*
  * Init functions
  */
@@ -48,15 +60,45 @@ function qw_init_frontend(){
   }
   // Wordpress hooks
   include_once QW_PLUGIN_DIR.'/includes/hooks.inc';
-  include_once QW_PLUGIN_DIR.'/includes/data.defaults.inc';
-  include_once QW_PLUGIN_DIR.'/includes/data.default_basics.inc';
-  include_once QW_PLUGIN_DIR.'/includes/data.default_filters.inc';
-  include_once QW_PLUGIN_DIR.'/includes/data.default_fields.inc';
-  include_once QW_PLUGIN_DIR.'/includes/data.default_sorts.inc';
+
   // Necessary functions to show a query
   include_once QW_PLUGIN_DIR.'/includes/query.inc';
   include_once QW_PLUGIN_DIR.'/includes/theme.inc';
-  include_once QW_PLUGIN_DIR.'/includes/pages.inc';
+  include_once QW_PLUGIN_DIR.'/includes/query-pages.inc';
+
+  // basic settings
+  include_once QW_PLUGIN_DIR.'/includes/basics/display_title.inc';
+  include_once QW_PLUGIN_DIR.'/includes/basics/empty.inc';
+  include_once QW_PLUGIN_DIR.'/includes/basics/footer.inc';
+  include_once QW_PLUGIN_DIR.'/includes/basics/header.inc';
+  include_once QW_PLUGIN_DIR.'/includes/basics/offset.inc';
+  include_once QW_PLUGIN_DIR.'/includes/basics/pager_types.inc';
+  include_once QW_PLUGIN_DIR.'/includes/basics/post_status.inc';
+  include_once QW_PLUGIN_DIR.'/includes/basics/posts_per_page.inc';
+  include_once QW_PLUGIN_DIR.'/includes/basics/row_styles.inc';
+  include_once QW_PLUGIN_DIR.'/includes/basics/template_styles.inc';
+  include_once QW_PLUGIN_DIR.'/includes/basics/wrapper_settings.inc';
+
+  // fields
+  include_once QW_PLUGIN_DIR.'/includes/fields/author.inc';
+  include_once QW_PLUGIN_DIR.'/includes/fields/author_avatar.inc';
+  include_once QW_PLUGIN_DIR.'/includes/fields/fields.inc';
+  include_once QW_PLUGIN_DIR.'/includes/fields/file_attachment.inc';
+  include_once QW_PLUGIN_DIR.'/includes/fields/image_attachment.inc';
+  include_once QW_PLUGIN_DIR.'/includes/fields/meta_value.inc';
+
+  // filters
+  include_once QW_PLUGIN_DIR.'/includes/filters/categories.inc';
+  include_once QW_PLUGIN_DIR.'/includes/filters/meta_key.inc';
+  include_once QW_PLUGIN_DIR.'/includes/filters/meta_key_value.inc';
+  include_once QW_PLUGIN_DIR.'/includes/filters/meta_value.inc';
+  include_once QW_PLUGIN_DIR.'/includes/filters/post_id.inc';
+  include_once QW_PLUGIN_DIR.'/includes/filters/post_parent.inc';
+  include_once QW_PLUGIN_DIR.'/includes/filters/post_types.inc';
+  include_once QW_PLUGIN_DIR.'/includes/filters/tags.inc';
+
+  // sort options
+  include_once QW_PLUGIN_DIR.'/includes/sorts/sorts.inc';
 }
 function qw_init(){
   qw_init_frontend();
@@ -64,10 +106,11 @@ function qw_init(){
   // admin only
   if(is_admin())
   {
-    include_once QW_PLUGIN_DIR.'/includes/query-admin.inc';
-    include_once QW_PLUGIN_DIR.'/includes/query-admin-pages.inc';
-    include_once QW_PLUGIN_DIR.'/includes/ajax.inc';
-    include_once QW_PLUGIN_DIR.'/includes/data.default_edit_themes.inc';
+    include_once QW_PLUGIN_DIR.'/admin/theme.inc';
+    include_once QW_PLUGIN_DIR.'/admin/query.inc';
+    include_once QW_PLUGIN_DIR.'/admin/pages.inc';
+    include_once QW_PLUGIN_DIR.'/admin/ajax.inc';
+    include_once QW_PLUGIN_DIR.'/admin/editors.inc';
 
     add_action( 'wp_ajax_nopriv_qw_form_ajax', 'qw_form_ajax' );
     add_action( 'wp_ajax_qw_form_ajax', 'qw_form_ajax' );
@@ -91,13 +134,6 @@ function qw_init(){
   }
 }
 
-if (!is_admin()){
-  add_action('init', 'qw_init');
-}
-add_action('admin_init', 'qw_init', 900);
-add_action('admin_init', 'qw_check_version', 901); // in query-admin.php
-add_action('admin_head', 'qw_admin_css'); // in query-admin.php
-
 /*
  * All my hook_menu implementations
  */
@@ -117,8 +153,6 @@ function qw_menu()
   $settings_page= add_submenu_page( 'query-wrangler', 'Settings', 'Settings', 'manage_options', 'qw-settings', 'qw_settings_page');
   //$debug_page  = add_submenu_page( 'query-wrangler', 'Debug', 'Debug', 'manage_options', 'qw-debug', 'qw_debug');
 }
-// add menu very last so we don't get replaced by another menu item
-add_action( 'admin_menu', 'qw_menu', 9999);
 
 /*
  * Shortcode support for all queries
@@ -142,7 +176,6 @@ function qw_single_query_shortcode($atts) {
   wp_reset_postdata();
   return $themed;
 }
-add_shortcode('query','qw_single_query_shortcode');
 
 /*===================================== DB TABLES =========================================*/
 /*

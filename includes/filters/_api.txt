@@ -1,0 +1,72 @@
+TODO:
+// http://codex.wordpress.org/Function_Reference/get_taxonomies
+
+/*
+ * Default Filters
+ *
+ * Template
+
+  $filters['hook_key'] = array(
+    // title shown when selecting a filter
+    'title' => 'Title',
+
+    // (optional) the query argument key
+    // if doesn't exist, defaults to the hook_key
+    'type' => 'filter_type',
+
+    // help text for the user
+    'description' => 'Describe this filter',
+
+    // which types of queries to allow this filter on
+    // some filters don't make sense on some query types
+    'query_display_types' => array('page','widget','override'),
+
+    // (optional) callback for form
+    // * This or a template must be used
+    // callback function should actually output the form
+    'form_callback' => 'callback_function_form_inner_form',
+
+    // (optional) template
+    // template wrangler theme function or template file
+    'form_template' => 'my_tw_template_hook',
+
+    // (optional) generate_args callback
+    // determines how form data becomes WP_Query arguments
+    // defaults to form key as WP_Query argument key
+    'query_args_callback' => 'qw_generate_query_args_post_types',
+
+    // (optional) process the exposed filter's values into the query args
+    // @param &$args - the arguments for the WP_Query
+    // @param $filter -
+    'exposed_process' => 'qw_filter_exposed_process_post_id',
+
+    // (optional) a form for gather settings for the exposed filter
+    // expects html output
+    // @param $filter
+    'exposed_settings_form' => 'qw_filter_exposed_settings_form_post_id',
+
+    // (optional) the form exposed to a user above the query
+    //  expects html output
+    // @param $filter -
+    'exposed_form' => 'qw_filter_exposed_form_post_id',
+  );
+
+ */
+/************************************************************************************************
+/*
+ * Filter's query_args_callbacks
+ * These functions convert form data into WP_Query arguments
+ */
+
+/*
+ * Forms and Argument Callbacks
+ *
+ *   $filter: Combined filter data and values saved
+ *   $filter['values']: Saved values for this filter
+ *   $filter['form_prefix']: beginning of a form item's name attribute
+ *
+ * Forms: return form output
+ * Argument Callbacks: return the entire output of the filter
+ *
+ *   $filter: filter values
+ */

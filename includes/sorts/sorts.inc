@@ -1,53 +1,11 @@
 <?php
+// add default field styles to the filter
+add_filter('qw_sort_options', 'qw_sorts_default');
+
 /*
- * Default Sort Options
- *
- * Template
-
-  $sort_options['hook_key'] = array(
-    // the title displayed to the query-wrangler user
-    'title' => 'The Select Option Label',
-
-    // some help text for the user about how this key works
-    'description' => 'A description of how this sort works',
-
-    // (optional) the WP_Query argument's value (essentially 'orderby_value')
-    // defaults to: the hook_key
-      // $args[$sort['orderby_key']] = $sort['type'];
-    'type' => 'wp_query_argument_key'
-
-    // (optional) a custom callback function for placing form values into a WP_Query as arguments
-    // defaults to:
-      //  $args[$sort['orderby_key']] = $sort['type'];
-      //  $args[$sort['order_key']] = $sort['order_value'];
-    'query_args_callback' => 'my_sort_option_args_callback',
-
-    // (optional) a custom callback for sort options forms
-    // if callback and template both aren't set,
-    //   defaults to:  'qw_form_default_sort_order_options'
-    'form_callback' => 'my_sort_option_form_callback',
-
-    // (optional) a template wrangler form template
-    'form_template' => 'my_tw_form_template',
-
-    // (optional) the WP_Query argument key equivalent to WP_Query's 'orderby'
-    // defaults to: 'orderby'
-    'orderby_key' => 'my_orderby_key',
-
-    // (optional) the WP_Query argument key equivalent to WP_Query's 'order'
-    // defaults to: 'order'
-    'order_key' => 'my_order_key',
-
-    // (optional) order options provided in a select menu
-    // defaults to:  below values
-    'order_options' => array(
-      'ASC' => 'Ascending',
-      'DESC' => 'Descending',
-    ),
-  );
-
+ * Sorts are generally very generic, so this one file includes all the defaults
  */
-function qw_default_sort_options($sort_options){
+function qw_sorts_default($sort_options){
 
   $sort_options['author_id'] = array(
     'title' => 'Author',
@@ -97,13 +55,13 @@ function qw_default_sort_options($sort_options){
   );
   return $sort_options;
 }
-// add default field styles to the filter
-add_filter('qw_sort_options', 'qw_default_sort_options');
 
 /*
+ * Most sort options are just ASC and DESC, so we use a default
+ * 
  * Default sort options 'order' options form
  */
-function qw_form_default_sort_order_options($sort)
+function qw_sorts_default_form_callback($sort)
 { ?>
     <!-- sort options -->
     <label class="qw-label">Order by <?php print $sort['title']; ?>:</label>

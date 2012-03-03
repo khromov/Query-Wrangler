@@ -357,44 +357,6 @@ function qw_get_hook_key($all, $single)
 }
 
 /*
- * Generate form prefixes for handlers
- *
- * @param string
- *    $type = sort, field, filter
- */
-function qw_make_form_prefix($type, $name){
-  $output = "qw-query-options";
-  switch($type){
-    case 'sort':
-      $output.= "[args][sorts]";
-      break;
-    case 'field':
-      $output.= "[display][field_settings][fields]";
-      break;
-    case 'filter':
-      $output.= "[args][filters]";
-      break;
-  }
-  $output.= "[".$name."]";
-  return $output;
-}
-/*
- * Function for grabbing meta keys
- *
- * @return array All meta keys in WP
- */
-function qw_get_meta_keys() {
-	global $wpdb;
-
-	$keys = $wpdb->get_col( "
-			SELECT meta_key
-			FROM $wpdb->postmeta
-			GROUP BY meta_key
-			ORDER BY meta_key" );
-
-	return $keys;
-}
-/*
  * usort callback. I likely stole this from somewhere.. like php.net
  */
 function qw_cmp($a,$b) {

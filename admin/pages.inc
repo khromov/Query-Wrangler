@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Handle the display of pages and actions
  */
@@ -55,7 +56,7 @@ function qw_page_handler(){
   }
   // else we need a list of queries
   else {
-    include QW_PLUGIN_DIR.'/forms/query-list.inc';
+    include QW_PLUGIN_DIR.'/admin/page-list.php';
     qw_list_queries_form();
   }
 }

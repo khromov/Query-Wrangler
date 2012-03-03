@@ -191,6 +191,29 @@ function qw_default_query_data(){
     ),
   );
 }
+
+/*
+ * Generate form prefixes for handlers
+ *
+ * @param string
+ *    $type = sort, field, filter
+ */
+function qw_make_form_prefix($type, $name){
+  $output = "qw-query-options";
+  switch($type){
+    case 'sort':
+      $output.= "[args][sorts]";
+      break;
+    case 'field':
+      $output.= "[display][field_settings][fields]";
+      break;
+    case 'filter':
+      $output.= "[args][filters]";
+      break;
+  }
+  $output.= "[".$name."]";
+  return $output;
+}
 /*
  * Slug creation
  */
@@ -225,25 +248,25 @@ function qw_init_edit_theme(){
 
 // CSS
 function qw_admin_css(){
-  print '<link rel="stylesheet" type="text/css" href="'.QW_PLUGIN_URL.'/css/jquery-ui.css" />';
-  print '<link rel="stylesheet" type="text/css" href="'.QW_PLUGIN_URL.'/css/query-wrangler.css" />';
+  print '<link rel="stylesheet" type="text/css" href="'.QW_PLUGIN_URL.'/admin/css/jquery-ui.css" />';
+  print '<link rel="stylesheet" type="text/css" href="'.QW_PLUGIN_URL.'/admin/css/query-wrangler.css" />';
 }
 // admin list page
 function qw_admin_list_js(){
   wp_enqueue_script('qw-admin-list-js',
-                  plugins_url('/js/query-wrangler-list.js', dirname(__FILE__)),
+                  plugins_url('/admin/js/query-wrangler-list.js', dirname(__FILE__)),
                   array(),
                   QW_VERSION);
 }
 // Base JS
 function qw_admin_js(){
   wp_enqueue_script('qw-admin-js',
-                  plugins_url('/js/query-wrangler.js', dirname(__FILE__)),
+                  plugins_url('/admin/js/query-wrangler.js', dirname(__FILE__)),
                   array('jquery-ui-core'),
                   QW_VERSION);
   // jquery unserialize form
   wp_enqueue_script('qw-unserialize-form',
-                  plugins_url('/js/jquery.unserialize-form.js', dirname(__FILE__)),
+                  plugins_url('/admin/js/jquery.unserialize-form.js', dirname(__FILE__)),
                   array(),
                   QW_VERSION);
   $data = qw_edit_json();
