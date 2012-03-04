@@ -29,8 +29,12 @@ $_SESSION['qw']['time']['execute']['start'] = microtime(1);
 // pre_render hook
   do_action_ref_array('qw_pre_render', array(&$options));
 
+$_SESSION['qw']['time']['execute']['end'] = microtime(1);
+
+$_SESSION['qw']['time']['template']['start'] = microtime(1);
   // get the themed content
   $themed = qw_template_query($wp_query, $options);
+$_SESSION['qw']['time']['template']['end'] = microtime(1);
 
   // Reset Post Data
   if($reset_post_data){
@@ -38,7 +42,6 @@ $_SESSION['qw']['time']['execute']['start'] = microtime(1);
     $wp_query = $old_query;
   }
 
-$_SESSION['qw']['time']['execute']['end'] = microtime(1);
   return $themed;
 }
 /*

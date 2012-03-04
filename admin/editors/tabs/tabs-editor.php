@@ -406,6 +406,12 @@
           <!-- WP_Query -->
         </div>
       </div>
+      <div class="group">
+        <div class="qw-setting-header">Query Time</div>
+        <div id="qw-show-query-time">
+          <!-- Query Time -->
+        </div>
+      </div>
     </div>
 
   </div>

@@ -32,10 +32,12 @@ QueryWrangler.get_preview = function() {
     data: post_data_form,
     dataType: 'json',
     success: function(results){
+      console.log(results);
       jQuery('#query-preview-target').html(results.preview);
       jQuery('#qw-show-arguments-target').html(results.args);
       jQuery('#qw-show-display-target').html(results.display);
       jQuery('#qw-show-wpquery-target').html(results.wpquery);
+      jQuery('#qw-show-query-time').html(results.time);
     }
   });
   // hide throbber

@@ -35,8 +35,6 @@ define('QW_PLUGIN_DIR', dirname(__FILE__));
 define('QW_PLUGIN_URL', plugins_url( '', __FILE__ ));
 define('QW_DEFAULT_THEME', 'views');
 
-$_SESSION['qw']['time']['load']['start'] = microtime(1);
-
 // Query Widget
 include_once QW_PLUGIN_DIR.'/widget.query.php';
 
@@ -105,6 +103,7 @@ function qw_init_frontend(){
   include_once QW_PLUGIN_DIR.'/includes/sorts/sorts.inc';
 }
 function qw_init(){
+$_SESSION['qw']['time']['load']['start'] = microtime(1);
   qw_init_frontend();
 
   // admin only
@@ -226,11 +225,12 @@ function qw_debug_query_time(){
   $output = '';
   if (is_array($_SESSION['qw']['time'])){
     $time = $_SESSION['qw']['time'];
+
     foreach ($time as $k => $v){
-      $math = round($v['end'] - $v['start'], 3);
+      $math = round($v['end'] - $v['start'], 4);
       $output.= "<div>".$k." took ".$math."s</div>";
     }
   }
 
-  print $output;
+  return $output;
 }

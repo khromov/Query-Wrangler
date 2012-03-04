@@ -1,9 +1,13 @@
 <?php
+$_SESSION['qw']['time']['preview']['start'] = microtime(1);
+
 global $wp_query;
 $temp = $wp_query;
 $wp_query = NULL;
 
 ob_start();
+
+$_SESSION['qw']['time']['execute']['start'] = microtime(1);
   // get the query options, force override
   $options = qw_generate_query_options($query_id, $options, true);
 
@@ -14,8 +18,12 @@ ob_start();
   // set the new query
   $wp_query = new WP_Query($args);
 
+$_SESSION['qw']['time']['execute']['end'] = microtime(1);
+
+$_SESSION['qw']['time']['template']['start'] = microtime(1);
   // get the themed content
   print qw_template_query($wp_query, $options);
+$_SESSION['qw']['time']['template']['end'] = microtime(1);
 $preview = ob_get_clean();
 
 // args
@@ -35,5 +43,9 @@ $preview = array(
 );
 
 do_action_ref_array('qw_post_preview', array(&$preview));
+
+$_SESSION['qw']['time']['preview']['end'] = microtime(1);
+
+$preview['time'] = qw_debug_query_time();
 
 print json_encode($preview);

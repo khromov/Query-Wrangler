@@ -181,8 +181,7 @@ function qw_query_pages_handler()
     // got results for a query
     if(is_object($rows[0]) && $query = $rows[0])
     {
-
-$_SESSION['qw']['time']['output']['start'] = microtime(1);
+$_SESSION['qw']['time']['page_load']['start'] = microtime(1);
       // pass the paged value into the query
       $options_override['args']['paged'] = $paged;
 
@@ -231,6 +230,8 @@ $_SESSION['qw']['time']['output']['start'] = microtime(1);
       $wp_query->is_archive     = false;
       $wp_query->is_category    = false;
 
+$_SESSION['qw']['time']['page_load']['end'] = microtime(1);
+$_SESSION['qw']['time']['page_template']['start'] = microtime(1);
       // According to http://codex.wordpress.org/Plugin_API/Action_Reference
       // we can safely exit here. The template will take care of the rest.
       // chosen template path
@@ -240,8 +241,8 @@ $_SESSION['qw']['time']['output']['start'] = microtime(1);
       }
 
       include($template_path);
-$_SESSION['qw']['time']['output']['end'] = microtime(1);
-//qw_debug_query_time();
+$_SESSION['qw']['time']['page_template']['end'] = microtime(1);
+//print qw_debug_query_time();
       exit();
     }
   }
