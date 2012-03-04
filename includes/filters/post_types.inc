@@ -11,7 +11,6 @@ function qw_filter_post_types($filters){
     'description' => 'Select which post types should be shown.',
     'form_callback' => 'qw_filter_post_types_form',
     'query_args_callback' => 'qw_filter_post_types_args',
-    'query_display_types' => array('page','widget','override'),
   );
   return $filters;
 }
@@ -20,7 +19,7 @@ function qw_filter_post_types($filters){
  * Convert values into query args
  */
 function qw_filter_post_types_args(&$args, $filter){
-  $args['post_type'] = $filter['post_types'];
+  $args['post_type'] = $filter['values']['post_types'];
 }
 
 

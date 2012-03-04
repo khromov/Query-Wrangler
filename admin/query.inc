@@ -368,7 +368,6 @@ function qw_preprocess_handlers($type, $handlers){
     // generate the form name prefixes
     foreach($handlers as $name => $values)
     {
-
       // load sort type data
       $hook_key = qw_get_hook_key($all, $values);
 
@@ -384,16 +383,7 @@ function qw_preprocess_handlers($type, $handlers){
       $this_handler['name'] = $name;
       $this_handler['form_prefix'] = qw_make_form_prefix($type, $name);
 
-      // this handler's form
-      if (function_exists($this_handler['form_callback'])){
-        ob_start();
-          $this_handler['form_callback']($this_handler);
-        $this_handler['form'] = ob_get_clean();
-      }
-      // provide template wrangler support
-      else if (isset($this_handler['form_template'])){
-        $this_handler['form'] = theme($this_handler['form_template'], array('this' => $this_handler));
-      }
+      qw_make_handler_forms($this_handler);
 
       // set new sort
       $handlers[$name] = $this_handler;
@@ -404,5 +394,33 @@ function qw_preprocess_handlers($type, $handlers){
     }
 
     return $handlers;
+  }
+}
+
+/*
+ * Look for handler forms and settings forms and execute the callbacks
+ */
+function qw_make_handler_forms(&$handler){
+
+  // this handler's form
+  if (function_exists($handler['form_callback'])){
+    ob_start();
+      $handler['form_callback']($handler);
+    $handler['form'] = ob_get_clean();
+  }
+  // provide template wrangler support
+  else if (isset($handler['form_template'])){
+    $handler['form'] = theme($handler['form_template'], array('this' => $handler));
+  }
+
+  // see if item has an exposed settings form
+  if (function_exists($handler['exposed_settings_form_callback'])) {
+    ob_start();
+      $handler['exposed_settings_form_callback']($handler);
+    $handler['exposed_settings_form'] = ob_get_clean();
+  }
+  // provide template wrangler support
+  else if (isset($handler['exposed_settings_form_template'])){
+    $handler['exposed_settings_form'] = theme($handler['exposed_settings_form_template'], array('this' => $handler));
   }
 }

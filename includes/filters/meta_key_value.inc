@@ -11,11 +11,10 @@ function qw_filter_meta_key_value($filters){
     'description' => 'Filter for a specific meta_key / meta_value pair.',
     'form_callback' => 'qw_filter_meta_key_value_form',
     'query_args_callback' => 'qw_filter_meta_key_value_args',
-    'query_display_types' => array('page','widget','override'),
     // exposed
-    //'exposed_process' => 'qw_filter_meta_key_value_exposed_process',
-    //'exposed_settings_form' => 'qw_filter_meta_key_value_exposed_settings_form',
     //'exposed_form' => 'qw_filter_meta_key_value_exposed_form',
+    //'exposed_process' => 'qw_filter_meta_key_value_exposed_process',
+    //'exposed_settings_form_callback' => 'qw_filter_meta_key_value_exposed_settings_form',
   );
   return $filters;
 }
@@ -24,9 +23,9 @@ function qw_filter_meta_key_value($filters){
  * Convert values into query args
  */
 function qw_filter_meta_key_value_args(&$args, $filter){
-  $args['meta_key'] = $filter['meta_key'];
-  $args['meta_value'] = stripslashes($filter['meta_value']);
-  $args['meta_compare'] = $filter['meta_compare'];
+  $args['meta_key'] = $filter['values']['meta_key'];
+  $args['meta_value'] = stripslashes($filter['values']['meta_value']);
+  $args['meta_compare'] = $filter['values']['meta_compare'];
 }
 
 /*

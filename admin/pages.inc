@@ -78,10 +78,26 @@ function qw_edit_query_form(){
   $fields  = qw_preprocess_handlers('field', $options['display']['field_settings']['fields']);
   $sorts   = qw_preprocess_handlers('sort', $options['args']['sorts']);
 
+  // basic settings
+  $basics = qw_all_basic_settings();
+
+  foreach ($basics as $hook_key => $basic){
+    // make the basic forms
+    if (isset($basic['form_callback']) && function_exists($basic['form_callback'])){
+      ob_start();
+        $basic['form_callback']($basic, $options);
+      $basics[$hook_key]['form'] = ob_get_clean();
+    }
+  }
+
   $theme = get_option('qw_edit_theme');
   if($theme == ""){
     $theme = QW_DEFAULT_THEME;
   }
+
+  // get rid of pesky slashes
+  $options['display'] = array_map( 'stripslashes_deep', $options['display'] );
+
   // start building edit page data
   $edit_args = array(
     // editor theme
@@ -97,6 +113,7 @@ function qw_edit_query_form(){
     'filters' => $filters,
     'fields' => $fields,
     'sorts' => $sorts,
+    'basics' => $basics,
 
     // all datas
     'post_statuses' => qw_all_post_statuses(),

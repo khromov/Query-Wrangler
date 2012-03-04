@@ -8,20 +8,19 @@ add_filter('qw_basics', 'qw_basic_settings_empty');
 function qw_basic_settings_empty($basics){
   $basics['empty'] = array(
     'title' => 'Empty Text',
-    'option_type' => 'display',
+    'type' => 'display',
     'description' => 'The content placed here will appear if the query has no results.',
     'form_callback' => 'qw_basic_settings_empty_form',
     'weight' => 0,
   );
-
   return $basics;
 }
 
-function qw_basic_settings_empty_form($basic, $display)
+function qw_basic_settings_empty_form($basic, $options)
 {
   ?>
     <p class="description"><?php print $basic['description']; ?></p>
     <textarea name="<?php print $basic['form_prefix']; ?>[empty]"
-              class="qw-field-textarea"><?php print qw_textarea($display['empty']); ?></textarea>
+              class="qw-field-textarea"><?php print qw_textarea($options['display']['empty']); ?></textarea>
   <?php
 }

@@ -14,11 +14,12 @@ add_filter('qw_row_fields_styles', 'qw_row_fields_styles_default');
 function qw_basic_settings_row_style($basics){
   $basics['display_row_style'] = array(
     'title' => 'Row Style',
-    'option_type' => 'display',
+    'type' => 'display',
     'description' => 'How should each post in this query be presented?',
     'form_callback' => 'qw_basic_settings_row_style_form',
     'weight' => 0,
   );
+  return $basics;
 }
 
 /*
@@ -64,7 +65,7 @@ function qw_row_fields_styles_default($row_fields_styles){
 /*
  * Form for selecting row style and settings
  */
-function qw_basic_settings_row_style_form($basic, $display)
+function qw_basic_settings_row_style_form($basic, $options)
 {
   $row_styles = qw_all_row_styles();
   ?>
@@ -74,7 +75,7 @@ function qw_basic_settings_row_style_form($basic, $display)
         foreach($row_styles as $type => $row_style)
         { ?>
             <option value="<?php print $type; ?>"
-                    <?php if($display['row_style'] == $type) { print 'selected="selected"';} ?>>
+                    <?php if($options['display']['row_style'] == $type) { print 'selected="selected"';} ?>>
               <?php print $row_style['title']; ?>
             </option>
           <?php
@@ -113,11 +114,11 @@ function qw_basic_settings_row_styles_posts_settings()
     <select class="qw-title-ignore"
             name="qw-query-options[display][post_settings][size]">
       <option value="complete"
-              <?php if($display['post_settings']['size'] == "complete") { print 'selected="selected"';} ?>>
+              <?php if($options['display']['post_settings']['size'] == "complete") { print 'selected="selected"';} ?>>
         Complete Post
       </option>
       <option value="excerpt"
-              <?php if($display['post_settings']['size'] == "excerpt") { print 'selected="selected"';} ?>>
+              <?php if($options['display']['post_settings']['size'] == "excerpt") { print 'selected="selected"';} ?>>
         Excerpt
       </option>
     </select>

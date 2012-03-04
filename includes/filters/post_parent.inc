@@ -10,7 +10,11 @@ function qw_filter_post_parent($filters){
     'title' => 'Post Parent',
     'description' => 'Use only with post type "Page" to show results with the chosen parent ID.',
     'form_callback' => 'qw_filter_post_parent_form',
-    'query_display_types' => array('page','widget'),
+    'allowed_query_types' => array('page','widget'),
+    // exposed
+    'exposed_form' => 'qw_filter_post_parent_exposed_form',
+    'exposed_process' => 'qw_filter_post_parent_exposed_process',
+    //'exposed_settings_form_callback' => 'qw_filter_post_parent_exposed_settings_form',
   );
   return $filters;
 }
@@ -26,3 +30,23 @@ function qw_filter_post_parent_form($filter)
          value="<?php print $filter['values']['post_parent']; ?>" />
   <?php
 }
+/*
+ * Process submitted exposed form values
+ */
+function qw_filter_post_parent_exposed_process(&$args, $filter, $value){
+  if(!empty($value)){
+    $args['post_parent'] = $value;
+  }
+}
+
+/*
+ * Exposed form
+ */
+function qw_filter_post_parent_exposed_form($filter)
+{ ?>
+  <input type="text"
+         name="<?php print $filter['exposed_key']; ?>"
+         value="<?php print $_GET[$filter['exposed_key']]; ?>" />
+  <?php
+}
+//function qw_filter_post_parent_exposed_settings_form($filter){}

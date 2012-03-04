@@ -8,7 +8,6 @@
  * See the following link for more details on how that works:
  * https://github.com/daggerhart/Query-Wrangler/wiki/Template-Wrangler
  */
-$display = array_map( 'stripslashes_deep', $display );
 ?>
 <form id="qw-edit-query-form" action='admin.php?page=query-wrangler&action=update&edit=<?php print $query_id; ?>&noheader=true' method='post'>
   <div id="qw-query-action-buttons">
@@ -31,26 +30,28 @@ $display = array_map( 'stripslashes_deep', $display );
       <div id="qw-query-args" class="qw-query-admin-options">
         <h4>Basic settings</h4>
         <?php
-          $basics = qw_all_basic_settings();
           foreach($basics as $basic)
           {
-            if(isset($basic['form_callback']) && function_exists($basic['form_callback']))
-            { ?>
-              <div class="qw-query-title" title="qw-<?php print $basic['hook_key']; ?>">
-                <?php print $basic['title']; ?>
-                :
-                <span class="qw-setting-value">
-                  <?php
-                    if ($options[$basic['option_type']][$basic['hook_key']]){
-                      print $options[$basic['option_type']][$basic['hook_key']];
-                    }
-                    else {
-                      print 'None';
-                    }
-                  ?>
-                </span>
-              </div>
-              <?php
+            if (in_array($query_type, $basic['allowed_query_types']) &&
+                $basic['type'] != 'page') {
+              if(isset($basic['form']))
+              { ?>
+                <div class="qw-query-title" title="qw-<?php print $basic['hook_key']; ?>">
+                  <?php print $basic['title']; ?>
+                  :
+                  <span class="qw-setting-value">
+                    <?php
+                      if ($options[$basic['type']][$basic['hook_key']]){
+                        print $options[$basic['type']][$basic['hook_key']];
+                      }
+                      else {
+                        print 'None';
+                      }
+                    ?>
+                  </span>
+                </div>
+                <?php
+              }
             }
           }
         ?>
@@ -63,35 +64,33 @@ $display = array_map( 'stripslashes_deep', $display );
           <div class="qw-clear-gone"><!-- ie hack -->&nbsp;</div>
           <div id="qw-page-settings" class="qw-query-admin-options">
             <h4>Page Settings</h4>
-
             <?php
-              // path for pages only
-              if($query_type == 'page')
-              { ?>
-                <div class="qw-query-title" title="qw-page-path">
-                  Page Path:
-                  <span class="qw-setting-value">
-                    <?php print ($query_page_path) ? $query_page_path : 'None'; ?>
-                  </span>
-                </div>
-                <?php
+              foreach($basics as $basic)
+              {
+                if (in_array($query_type, $basic['allowed_query_types']) &&
+                    $basic['type'] == 'page') {
+                  if(isset($basic['form']))
+                  { ?>
+                    <div class="qw-query-title" title="qw-<?php print $basic['hook_key']; ?>">
+                      <?php print $basic['title']; ?>
+                      :
+                      <span class="qw-setting-value">
+                        <?php
+                          if ($options[$basic['type']][$basic['hook_key']]){
+                            print $options[$basic['type']][$basic['hook_key']];
+                          }
+                          else {
+                            print 'None';
+                          }
+                        ?>
+                      </span>
+                    </div>
+                    <?php
+                  }
+                }
               }
             ?>
-            <div class="qw-query-title" title="qw-page-template">
-              Page Template:
-              <span class="qw-setting-value">
-                <?php print ($display['page']['template-name']) ? $display['page']['template-name'] : 'Default'; ?>
-              </span>
-            </div>
-
-            <div class="qw-query-title" title="qw-page-pager">
-              Pager:
-              <span class="qw-setting-value">
-                <?php print ($pager_types[$display['page']['pager']['type']]['title']) ? $pager_types[$display['page']['pager']['type']]['title'] : 'Default'; ?>
-              </span>
-            </div>
           </div>
-          <!-- /page settings -->
           <?php
         }
       ?>
@@ -242,110 +241,19 @@ $display = array_map( 'stripslashes_deep', $display );
       <div id="qw-options-forms">
 <!-- Basic Settings -->
       <?php
-        $basics = qw_all_basic_settings();
         foreach($basics as $basic)
         {
-          if(isset($basic['form_callback']) && function_exists($basic['form_callback']))
+          if(isset($basic['form']))
           { ?>
             <div id="qw-<?php print $basic['hook_key']; ?>" class="qw-item-form">
               <?php
-                $basic['form_callback']($basic, $options[$basic['option_type']]);
+                print $basic['form'];
               ?>
             </div>
             <?php
           }
         }
       ?>
-
-<!-- Page Settings -->
-        <?php
-          // use template & pager on pages and overrides
-          if($query_type == "page" || $query_type == "override")
-          { ?>
-            <!-- page template -->
-            <div id="qw-page-template" class="qw-item-form">
-              <p>
-                Select which page template should wrap this query page.
-              </p>
-              <select name="qw-query-options[display][page][template-file]" id="qw-page-template">
-                <option value="index.php">Default</option>
-                <?php
-                  foreach($page_templates as $name => $file)
-                  { ?>
-                    <option value="<?php print $file; ?>"
-                            <?php if($file == $display['page']['template-file']) { print 'selected="selected"'; } ?>>
-                      <?php print $name; ?>
-                    </option>
-                    <?php
-                  }
-                ?>
-              </select>
-            </div>
-
-            <!-- pager -->
-            <div id="qw-page-pager" class="qw-item-form">
-              <p>
-                Select which type of pager to use.
-              </p>
-              <label class='qw-field-checkbox'>
-                <?php
-                  $use_pager = ($display['page']['pager']['active']) ? 'checked="checked"': '';
-                ?>
-                <input type='checkbox'
-                       name="qw-query-options[display][page][pager][active]"
-                       <?php print $use_pager;?> />
-                Use Pagination
-              </label>
-
-              <select name="qw-query-options[display][page][pager][type]">
-                <?php
-                  foreach($pager_types as $pager_name => $pager_options)
-                  {
-                    $selected = ($display['page']['pager']['type'] == $pager_name) ? 'selected="selected"' : '';
-                    ?>
-                    <option value="<?php echo $pager_name; ?>"
-                            <?php echo $selected; ?>>
-                      <?php echo $pager_options['title']; ?>
-                    </option>
-                    <?php
-                  }
-                ?>
-              </select>
-              <p>
-                Use the following options to change the Default Pager labels.
-              </p>
-              <strong>Previous Page Label:</strong>
-              <p>
-                <input type="text"
-                       name="qw-query-options[display][page][pager][previous]"
-                       value="<?php print $display['page']['pager']['previous']; ?>" />
-              </p>
-              <strong>Next Page Label:</strong>
-              <p>
-                <input type="text"
-                       name="qw-query-options[display][page][pager][next]"
-                       value="<?php print $display['page']['pager']['next']; ?>" />
-              </p>
-            </div>
-            <?php
-          }
-
-          // pages only
-          if($query_type == 'page')
-          { ?>
-            <!-- page path -->
-            <div id="qw-page-path" class="qw-item-form">
-              <p>
-                The path or permalink you want this page to use. Avoid using spaces and capitalization for best results.
-              </p>
-              <input size="60"
-                     type="text"
-                     name="qw-query-options[display][page][path]"
-                     value="<?php print $query_page_path; ?>" />
-            </div>
-            <?php
-          }
-        ?>
 
 <!-- Edit Existing handlers -->
       <!-- edit sorts -->
@@ -474,7 +382,7 @@ $display = array_map( 'stripslashes_deep', $display );
               foreach($all_filters as $hook_key => $filter)
               {
                 // for now, this is how I'll prevent certain filters on overrides
-                if(in_array($query_type, $filter['query_display_types']))
+                if(in_array($query_type, $filter['allowed_query_types']))
                 { ?>
                   <label class="qw-filter-checkbox">
                     <input type="checkbox"

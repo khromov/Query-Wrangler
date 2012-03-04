@@ -32,3 +32,9 @@
 .qw-empty-list {
   padding: 6px 12px;
 }
+ul.qw-field-tokens-list li {
+  font-weight: bold;
+}
+.qw-field-textarea {
+  height: 300px;
+}

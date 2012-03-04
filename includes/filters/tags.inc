@@ -11,7 +11,7 @@ function qw_filter_tags($filters){
     'description' => 'Select which tags to use.',
     'form_callback' => 'qw_filter_tags_form',
     'query_args_callback' => 'qw_filter_tags_args',
-    'query_display_types' => array('page','widget'),
+    'allowed_query_types' => array('page','widget'),
   );
   return $filters;
 }
@@ -20,8 +20,8 @@ function qw_filter_tags($filters){
  * Convert values into query args
  */
 function qw_filter_tags_args(&$args, $filter){
-  if(is_array($filter['tags'])){
-    $args[$filter['tag_operator']] = array_keys($filter['tags']);
+  if(is_array($filter['values']['tags'])){
+    $args[$filter['values']['tag_operator']] = array_keys($filter['values']['tags']);
   }
 }
 

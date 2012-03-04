@@ -76,6 +76,9 @@ label.qw-label {
   float: left;
   margin-right: 12px;
 }
+.clear-left {
+  clear: left;
+}
 .qw-setting {
   padding-bottom: 12px;
   margin-bottom: 12px;

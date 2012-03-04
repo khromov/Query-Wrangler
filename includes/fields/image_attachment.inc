@@ -29,8 +29,8 @@ function qw_field_image_attachment_form($field)
            type="text"
            name='<?php print $field['form_prefix']; ?>[image_display_count]'
            value="<?php print ($field['values']['image_display_count']) ? $field['values']['image_display_count']: 0;?>" />
-
-    <p>
+    <p class="description">Number of images to show.  Use 0 (zero) to show all attached images.</p>
+    <div>
       <label class="qw-label">Image Display Style:</label>
       <select name='<?php print $field['form_prefix']; ?>[image_display_style]'>
         <?php
@@ -43,7 +43,8 @@ function qw_field_image_attachment_form($field)
           }
         ?>
       </select>
-    </p>
+      <p class="description">Select the style of the image.</p>
+    </div>
   <?php
 }
 

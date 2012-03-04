@@ -8,7 +8,7 @@ add_filter('qw_basics', 'qw_basic_settings_header');
 function qw_basic_settings_header($basics){
   $basics['header'] = array(
     'title' => 'Header',
-    'option_type' => 'display',
+    'type' => 'display',
     'description' => 'The content placed here will appear above the resulting query.',
     'form_callback' => 'qw_basic_settings_header_form',
     'weight' => 0,
@@ -17,11 +17,11 @@ function qw_basic_settings_header($basics){
   return $basics;
 }
 
-function qw_basic_settings_header_form($basic, $display)
+function qw_basic_settings_header_form($basic, $options)
 {
   ?>
     <p class="description"><?php print $basic['description']; ?></p>
     <textarea name="<?php print $basic['form_prefix']; ?>[header]"
-            class="qw-field-textarea"><?php print qw_textarea($display['header']); ?></textarea>
+            class="qw-field-textarea"><?php print qw_textarea($options['display']['header']); ?></textarea>
   <?php
 }

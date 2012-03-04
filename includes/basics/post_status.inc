@@ -10,9 +10,9 @@ add_filter('qw_post_statuses', 'qw_post_statuses_default');
 function qw_basic_settings_post_status($basics){
   $basics['post_status'] = array(
     'title' => 'Posts Status',
-    'option_type' => 'args',
+    'type' => 'args',
     'description' => 'Select the post status of the items displayed.',
-    'form_callback' => 'qw_basic_post_status_form',
+    'form_callback' => 'qw_basic_settings_post_status_form',
     'weight' => 0,
   );
   return $basics;
@@ -46,7 +46,7 @@ function qw_post_statuses_default($post_statuses){
   return $post_statuses;
 }
 
-function qw_basic_settings_post_status_form($basic, $args)
+function qw_basic_settings_post_status_form($basic, $options)
 {
   $post_statuses = qw_all_post_statuses();
   ?>
@@ -56,7 +56,7 @@ function qw_basic_settings_post_status_form($basic, $args)
         foreach($post_statuses as $key => $post_status)
         { ?>
             <option value="<?php print $key; ?>"
-                    <?php if($args['post_status'] == $key) { print 'selected="selected"';} ?>>
+                    <?php if($options['args']['post_status'] == $key) { print 'selected="selected"';} ?>>
               <?php print $post_status['title']; ?>
             </option>
           <?php

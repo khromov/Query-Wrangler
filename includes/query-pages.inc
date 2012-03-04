@@ -181,6 +181,8 @@ function qw_query_pages_handler()
     // got results for a query
     if(is_object($rows[0]) && $query = $rows[0])
     {
+
+$_SESSION['qw']['time']['output']['start'] = microtime(1);
       // pass the paged value into the query
       $options_override['args']['paged'] = $paged;
 
@@ -238,7 +240,8 @@ function qw_query_pages_handler()
       }
 
       include($template_path);
-
+$_SESSION['qw']['time']['output']['end'] = microtime(1);
+//qw_debug_query_time();
       exit();
     }
   }

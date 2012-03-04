@@ -94,9 +94,7 @@
           <textarea name='<?php print $field['form_prefix']; ?>[custom_output]'
                     class="qw-field-textarea"><?php print ($field['values']['custom_output']) ? qw_textarea($field['values']['custom_output']): ''; ?></textarea>
           <div class="qw-field-tokens">
-            <p>
-              Available replacement tokens.  These tokens will be replaced with the processed results of their fields.
-            </p>
+            <p class="description">Available replacement tokens.  These tokens will be replaced with the processed results of their fields.</p>
             <?php
               if(is_array($tokens))
               { ?>

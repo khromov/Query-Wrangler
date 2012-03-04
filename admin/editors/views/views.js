@@ -89,7 +89,7 @@ QueryWrangler.set_setting_title = function(){
   jQuery.each(fields, function(i, field){
     // select
     if (jQuery(field).is('select')){
-      new_title.push( jQuery(field).children('option[value='+jQuery(field).val()+']').text() );
+      new_title.push( jQuery(field).children('option[selected=selected]').text() );
     }
     // text field
     if (jQuery(field).is('input[type=text]') &&
@@ -323,7 +323,7 @@ jQuery(document).ready(function(){
     jQuery('#'+QueryWrangler.current_form_id).dialog({
       modal: true,
       width: '60%',
-      height: 440,
+      height: 460,
       title: dialog_title[0],
       resizable: false,
       close: function() {

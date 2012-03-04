@@ -1,6 +1,23 @@
 <?php
 // add default pager types
 add_filter('qw_pager_types', 'qw_pager_types_default', 0);
+// hook into qw_basics
+add_filter('qw_basics', 'qw_basic_settings_pager',0);
+
+/*
+ * Basic Settings
+ */
+function qw_basic_settings_pager($basics){
+  $basics['pager'] = array(
+    'title' => 'Pager',
+    'type' => 'page',
+    'description' => 'Enable pagination for this query.',
+    'form_callback' => 'qw_basic_settings_pager_form',
+    'allowed_query_types' => array('page', 'override'),
+    'weight' => 0,
+  );
+  return $basics;
+}
 
 /*
  * Setup pager types
@@ -25,6 +42,61 @@ function qw_pager_types_default($pagers) {
   return $pagers;
 }
 
+/*
+ * Form callback
+ */
+function qw_basic_settings_pager_form($basic, $options)
+{
+  $pager = $options['display']['page']['pager'];
+  $pager_types = qw_all_pager_types();
+  $use_pager = ($pager['active']) ? 'checked="checked"': '';
+  ?>
+  <div class="qw-setting">
+    <label class="qw-label">Use Pagination:</label>
+    <label class='qw-field-checkbox'>
+      <input type='checkbox'
+             name="<?php print $basic['form_prefix']; ?>[pager][active]"
+             <?php print $use_pager;?> />
+    </label>
+    <div class="clear-left">
+      <p class="description"><?php print $basic['description']; ?></p>
+    </div>
+  </div>
+
+  <div class="qw-setting">
+    <label class="qw-label">Pager Type:</label>
+    <select name="<?php print $basic['form_prefix']; ?>[pager][type]">
+      <?php
+        foreach($pager_types as $pager_name => $pager_options)
+        {
+          $selected = ($pager['type'] == $pager_name) ? 'selected="selected"' : '';
+          ?>
+          <option value="<?php echo $pager_name; ?>"
+                  <?php echo $selected; ?>>
+            <?php echo $pager_options['title']; ?>
+          </option>
+          <?php
+        }
+      ?>
+    </select>
+    <p class="description">Select which type of pager to use.</p>
+  </div>
+
+  <div>
+    <label class="qw-label">Previous Label:</label>
+    <input type="text"
+           name="<?php print $basic['form_prefix']; ?>[pager][previous]"
+           value="<?php print $pager['previous']; ?>" />
+  </div>
+  <div>
+    <label class="qw-label">Next Label:</label>
+    <input type="text"
+           name="<?php print $basic['form_prefix']; ?>[pager][next]"
+           value="<?php print $pager['next']; ?>" />
+  </div>
+  <p class="description">Use the following options to change the Default Pager labels.</p>
+  <?php
+}
 
 /*
  * Custom Default Pager

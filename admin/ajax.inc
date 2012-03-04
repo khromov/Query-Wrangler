@@ -64,14 +64,7 @@ function qw_form_ajax()
   $item['name'] = $_POST['name'];
   $item['form_prefix'] = qw_make_form_prefix($handler, $item['name']);
 
-  // handler item's form
-  if (function_exists($item['form_callback'])){
-    $item['form'] = $item['form_callback']($item);
-  }
-  // provide template wrangler support
-  else if (isset($item['form_template'])){
-    $item['form'] = theme($item['form_template'], array($handler => $item));
-  }
+  qw_make_handler_forms($item);
 
   $args = array(
     $handler => $item,

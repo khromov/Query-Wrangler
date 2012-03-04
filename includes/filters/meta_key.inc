@@ -11,23 +11,12 @@ function qw_filter_meta_key($filters){
     'description' => 'Filter for a specific meta_key.',
     'form_callback' => 'qw_filter_meta_key_form',
     'query_args_callback' => 'qw_filter_meta_key_args',
-    'query_display_types' => array('page','widget','override'),
     // exposed
-    //'exposed_process' => 'qw_filter_meta_key_exposed_process',
-    //'exposed_settings_form' => 'qw_filter_meta_key_exposed_settings_form',
     'exposed_form' => 'qw_filter_meta_key_exposed_form',
+    'exposed_process' => 'qw_filter_meta_key_exposed_process',
+    //'exposed_settings_form_callback' => 'qw_filter_meta_key_exposed_settings_form',
   );
   return $filters;
-}
-
-/*
- * Process submitted exposed form values
- */
-function qw_filter_meta_key_args(&$args, $filter){
-  $values = $_GET[$filter['exposed_key']];
-  if(!empty($values)){
-    $args[$filter['compare']] = $values;
-  }
 }
 
 /*
@@ -42,10 +31,20 @@ function qw_filter_meta_key_form($filter)
 }
 
 /*
+ * Process submitted exposed form values
+ */
+function qw_filter_meta_key_exposed_process(&$args, $filter, $value){
+  if(!empty($value)){
+    $args['meta_key'] = $value;
+  }
+}
+
+/*
  * Exposed form
  */
 function qw_filter_meta_key_exposed_form($filter)
-{ ?>
+{
+  ?>
   <input type="text"
          name="<?php print $filter['exposed_key']; ?>"
          value="<?php print $_GET[$filter['exposed_key']]; ?>" />

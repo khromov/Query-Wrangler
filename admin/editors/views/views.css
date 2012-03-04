@@ -86,9 +86,8 @@ ul.qw-field-tokens-list li {
   font-weight: bold;
 }
 .qw-field-options {
-  margin: 4px 180px 4px 0px;
+  margin: 4px 4px 4px 0px;
   padding: 4px;
-  border: 1px solid #ddd;
 }
 .qw-query-add-titles span {
   display: block;
@@ -120,8 +119,7 @@ ul.qw-field-tokens-list li {
 .qw-sort-filter-name,
 .qw-sort-sort-name,
 .qw-hidden,
-.qw-item-form .qw-setting-header,
-.qw-field-options-hidden {
+.qw-item-form .qw-setting-header {
   display: none;
 }
 
@@ -137,7 +135,7 @@ ul.qw-field-tokens-list li {
   padding: 4px 20px;
 }
 .qw-field-textarea {
-  width: 600px;
+  width: 100%;
   height: 300px;
 }
 .qw-create {

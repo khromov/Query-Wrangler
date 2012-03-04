@@ -8,7 +8,6 @@
  * See the following link for more details on how that works:
  * https://github.com/daggerhart/Query-Wrangler/wiki/Template-Wrangler
  */
-$display = array_map( 'stripslashes_deep', $display );
 ?>
 <form id="qw-edit-query-form" action='admin.php?page=query-wrangler&action=update&edit=<?php print $query_id; ?>&noheader=true' method='post'>
   <div id="qw-query-action-buttons">
@@ -39,49 +38,21 @@ $display = array_map( 'stripslashes_deep', $display );
       <li><a href="#tabs-sorts">Sorts</a></li>
     </ul>
 
-<!-- basics -->
-    <div id="tabs-basics" class="qw-query-admin-tabs">
-      <?php
-        /*
-         $basics = qw_all_basic_settings();
-        foreach($basics as $basic)
-        { ?>
-          <div class="qw-setting">
-            <label class="qw-label"><?php print $basic['title']; ?>:</label>
-            <?php
-              if(isset($basic['form_callback']) && function_exists($basic['form_callback']))
-              { ?>
-                <div class="qw-form">
-                  <?php
-                    print $basic['form_callback']($basic, $options[$basic['option_type']]);
-                  ?>
-                </div>
-                <?php
-              }
-            ?>
-          </div>
-          <?php
-        }
-        */
-      ?>
-    </div>
-
+  <!-- basic settings 'args' -->
     <div id="tabs-args" class="qw-query-admin-tabs">
       <?php
-        $basics = qw_all_basic_settings();
         foreach($basics as $basic)
         {
-          if ($basic['option_type'] == 'args')
+          if ($basic['type'] == 'args' &&
+              in_array($query_type, $basic['allowed_query_types']))
           { ?>
             <div class="qw-setting">
               <label class="qw-label"><?php print $basic['title']; ?>:</label>
               <?php
-                if(isset($basic['form_callback']) && function_exists($basic['form_callback']))
+                if(isset($basic['form']))
                 { ?>
                   <div class="qw-form">
-                    <?php
-                      $basic['form_callback']($basic, $options[$basic['option_type']]);
-                    ?>
+                    <?php print $basic['form']; ?>
                   </div>
                   <?php
                 }
@@ -93,22 +64,21 @@ $display = array_map( 'stripslashes_deep', $display );
       ?>
     </div>
 
+  <!-- basic settings 'display' -->
     <div id="tabs-display" class="qw-query-admin-tabs">
       <?php
-        $basics = qw_all_basic_settings();
         foreach($basics as $basic)
         {
-          if ($basic['option_type'] == 'display')
+          if ($basic['type'] == 'display' &&
+              in_array($query_type, $basic['allowed_query_types']))
           { ?>
             <div class="qw-setting">
               <label class="qw-label"><?php print $basic['title']; ?>:</label>
               <?php
-                if(isset($basic['form_callback']) && function_exists($basic['form_callback']))
+                if(isset($basic['form']))
                 { ?>
                   <div class="qw-form">
-                    <?php
-                      $basic['form_callback']($basic, $options[$basic['option_type']]);
-                    ?>
+                    <?php print $basic['form']; ?>
                   </div>
                   <?php
                 }
@@ -121,98 +91,36 @@ $display = array_map( 'stripslashes_deep', $display );
     </div>
 
 <!-- Page Settings -->
-  <?php
-    // use template & pager on pages and overrides
-    if($query_type == "page" || $query_type == "override")
-    { ?>
-      <div id="tabs-page" class="qw-query-admin-tabs">
-        <!-- page template -->
-        <div class="qw-setting">
-          <label class="qw-label">Page Template:</label>
-          <select name="qw-query-options[display][page][template-file]" id="qw-page-template">
-            <option value="index.php">Default</option>
-            <?php
-              foreach($page_templates as $name => $file)
-              { ?>
-                <option value="<?php print $file; ?>"
-                        <?php if($file == $display['page']['template-file']) { print 'selected="selected"'; } ?>>
-                  <?php print $name; ?>
-                </option>
-                <?php
-              }
-            ?>
-          </select>
-          <p class="description">Select which page template should wrap this query page.</p>
-        </div>
-
-      <!-- pager -->
-        <div class="qw-setting">
-          <label class="qw-label">Use Pagination:</label>
-          <label class='qw-field-checkbox'>
-            <?php
-              $use_pager = ($display['page']['pager']['active']) ? 'checked="checked"': '';
-            ?>
-            <input type='checkbox'
-                   name="qw-query-options[display][page][pager][active]"
-                   <?php print $use_pager;?> />
-          </label>
-        </div>
-
-        <div class="qw-setting">
-          <label class="qw-label">Pager Type:</label>
-          <select name="qw-query-options[display][page][pager][type]">
-            <?php
-              foreach($pager_types as $pager_name => $pager_options)
-              {
-                $selected = ($display['page']['pager']['type'] == $pager_name) ? 'selected="selected"' : '';
-                ?>
-                <option value="<?php echo $pager_name; ?>"
-                        <?php echo $selected; ?>>
-                  <?php echo $pager_options['title']; ?>
-                </option>
-                <?php
-              }
-            ?>
-          </select>
-          <p class="description">Select which type of pager to use.</p>
-        </div>
-
-        <div class="qw-setting">
-          <label class="qw-label">Previous Label:</label>
-          <input type="text"
-                 name="qw-query-options[display][page][pager][previous]"
-                 value="<?php print $display['page']['pager']['previous']; ?>" />
-
-          <br style="float: none; clear: left;" />
-
-          <label class="qw-label">Next Label:</label>
-          <input type="text"
-                 name="qw-query-options[display][page][pager][next]"
-                 value="<?php print $display['page']['pager']['next']; ?>" />
-          <p class="description">Change the Default Pager labels.</p>
-        </div>
-
+    <div id="tabs-page" class="qw-query-admin-tabs">
       <?php
-      // pages only
-      if($query_type == 'page')
-      { ?>
-          <!-- page path -->
-          <div class="qw-setting">
-            <label class="qw-label">Page Path:</label>
-            <input size="60"
-                   type="text"
-                   name="qw-query-options[display][page][path]"
-                   value="<?php print $query_page_path; ?>" />
-            <p class="description">The path or permalink you want this page to use. Avoid using spaces and capitalization for best results.</p>
-          </div>
-        <?php
-      }
+        foreach($basics as $basic)
+        {
+          if ($basic['type'] == 'page' &&
+              in_array($query_type, $basic['allowed_query_types']))
+          { ?>
+            <div class="qw-setting">
+              <?php
+                // hack to prettify
+                if ($basic['title'] != 'Pager')
+                { ?>
+                  <label class="qw-label"><?php print $basic['title']; ?>:</label>
+                  <?php
+                }
+
+                if(isset($basic['form']))
+                { ?>
+                  <div class="qw-form">
+                    <?php print $basic['form']; ?>
+                  </div>
+                  <?php
+                }
+              ?>
+            </div>
+            <?php
+          }
+        }
       ?>
-      </div><!-- /page tab -->
-      <?php
-    }
-  ?>
-
+    </div>
 
 <!-- Overrides -->
   <?php
@@ -278,7 +186,7 @@ $display = array_map( 'stripslashes_deep', $display );
           Add Fields
         </span>
       </div>
-      <p class="description">Drag and drop the fields to change their order.</p>
+      <p class="description">Click to change settings.  Drag and drop the fields to change their order.</p>
 
       <!-- edit fields -->
       <div id="existing-fields" class="qw-sortable-list">
@@ -324,7 +232,7 @@ $display = array_map( 'stripslashes_deep', $display );
           Add Sort Options
         </span>
       </div>
-      <p class="description">Drag and drop the sort options to change their order.</p>
+      <p class="description">Click to change settings.  Drag and drop the sort options to change their order.</p>
 
       <!-- edit sorts -->
       <div id="existing-sorts" class="qw-sortable-list">
@@ -357,7 +265,7 @@ $display = array_map( 'stripslashes_deep', $display );
           Add Filters
         </span>
       </div>
-      <p class="description">Drag and drop the filters to change their order.</p>
+      <p class="description">Click to change settings.  Drag and drop the filters to change their order.</p>
       <!-- edit Filters -->
       <div id="existing-filters" class="qw-sortable-list">
         <?php
@@ -444,7 +352,7 @@ $display = array_map( 'stripslashes_deep', $display );
               foreach($all_filters as $hook_key => $filter)
               {
                 // for now, this is how I'll prevent certain filters on overrides
-                if(in_array($query_type, $filter['query_display_types']))
+                if(in_array($query_type, $filter['allowed_query_types']))
                 { ?>
                   <label class="qw-filter-checkbox">
                     <input type="checkbox"

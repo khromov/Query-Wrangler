@@ -11,11 +11,10 @@ function qw_filter_post_id($filters){
     'description' => 'Provide a list of post_ids to show or not show.',
     'form_callback' => 'qw_filter_post_id_form',
     'query_args_callback' => 'qw_filter_post_id_args',
-    'query_display_types' => array('page','widget','override'),
     // exposed
-    'exposed_process' => 'qw_filter_post_id_exposed_process',
-    //'exposed_settings_form' => 'qw_filter_post_id_exposed_settings_form',
     'exposed_form' => 'qw_filter_post_id_exposed_form',
+    'exposed_process' => 'qw_filter_post_id_exposed_process',
+    //'exposed_settings_form_callback' => 'qw_filter_post_id_exposed_settings_form',
   );
   return $filters;
 }
@@ -24,9 +23,9 @@ function qw_filter_post_id($filters){
  * Convert values into query args
  */
 function qw_filter_post_id_args(&$args, $filter){
-  $pids = explode(",", $filter['post_ids']);
+  $pids = explode(",", $filter['values']['post_ids']);
   array_walk($pids, 'qw_trim');
-  $args[$filter['compare']] = $pids;
+  $args[$filter['values']['compare']] = $pids;
 }
 
 /*
@@ -49,10 +48,9 @@ function qw_filter_post_id_form($filter)
 /*
  * Process submitted exposed form values
  */
-function qw_filter_post_id_exposed_process(&$args, $filter){
-  $values = $_GET[$filter['exposed_key']];
-  if(!empty($values)){
-    $args[$filter['compare']] = explode(",", $values);
+function qw_filter_post_id_exposed_process(&$args, $filter, $value){
+  if(!empty($value)){
+    $args[$filter['compare']] = explode(",", $value);
   }
 }
 

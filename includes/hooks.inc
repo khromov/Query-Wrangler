@@ -12,9 +12,19 @@ function qw_all_edit_themes(){
 function qw_all_basic_settings(){
   $basics = apply_filters('qw_basics', array());
 
-  foreach($basics as $hook_key => $basic){
-    $basics[$hook_key]['form_prefix'] = 'qw-query-options['.$basic['option_type'].']';
+  foreach($basics as $hook_key => $basic){  
+    if ($basic['type'] == 'page') {
+      $basics[$hook_key]['form_prefix'] = 'qw-query-options[display]['.$basic['type'].']';
+    }
+    else {
+      $basics[$hook_key]['form_prefix'] = 'qw-query-options['.$basic['type'].']';
+    }
     $basics[$hook_key]['hook_key'] = $hook_key;
+
+    // set default query types to all
+    if (!isset($basic['allowed_query_types'])){
+      $basics[$hook_key]['allowed_query_types'] = array('page','widget','override');
+    }
   }
   return $basics;
 }
@@ -23,12 +33,12 @@ function qw_all_basic_settings(){
  */
 function qw_all_fields(){
   $fields = apply_filters('qw_fields', array());
-  foreach($fields as $type => $field){
+  foreach($fields as $hook_key => $field){
     if(!isset($field['type'])){
-      $fields[$type]['type'] = $type;
+      $fields[$hook_key]['type'] = $hook_key;
     }
     // maintain the hook's key
-    $fields[$type]['hook_key'] = $type;
+    $fields[$hook_key]['hook_key'] = $hook_key;
   }
 
   // sort them by title
@@ -47,13 +57,19 @@ function qw_all_fields(){
 function qw_all_filters(){
   $filters = apply_filters('qw_filters', array());
 
-  foreach($filters as $type => $filter){
+  foreach($filters as $hook_key => $filter){
     // set filter's type as a value if not provided by filter
     if(!isset($filter['type'])){
-      $filters[$type]['type'] = $type;
+      $filters[$hook_key]['type'] = $hook_key;
     }
+
+    // set default query types to all
+    if (!isset($filter['allowed_query_types'])){
+      $filters[$hook_key]['allowed_query_types'] = array('page','widget','override');
+    }
+
     // maintain the hook's key
-    $filters[$type]['hook_key'] = $type;
+    $filters[$hook_key]['hook_key'] = $hook_key;
   }
 
   // sort them by title
@@ -73,18 +89,18 @@ function qw_all_sort_options(){
   $sort_options = apply_filters('qw_sort_options', array());
 
   // set some defaults for very simple hooks
-  foreach($sort_options as $type => $option){
+  foreach($sort_options as $hook_key => $option){
     if(!isset($option['type'])){
-      $sort_options[$type]['type'] = $type;
+      $sort_options[$hook_key]['type'] = $hook_key;
     }
     if(!isset($option['orderby_key'])){
-      $sort_options[$type]['orderby_key'] = 'orderby';
+      $sort_options[$hook_key]['orderby_key'] = 'orderby';
     }
     if(!isset($option['order_key'])){
-      $sort_options[$type]['order_key'] = 'order';
+      $sort_options[$hook_key]['order_key'] = 'order';
     }
     if(!isset($option['order_options'])){
-      $sort_options[$type]['order_options'] =array(
+      $sort_options[$hook_key]['order_options'] =array(
         'ASC' => 'Ascending',
         'DESC' => 'Descending',
       );
@@ -92,11 +108,11 @@ function qw_all_sort_options(){
 
     // default form_callback
     if(!isset($option['form_callback']) && !isset($option['form_template'])){
-      $sort_options[$type]['form_callback'] = 'qw_sorts_default_form_callback';
+      $sort_options[$hook_key]['form_callback'] = 'qw_sorts_default_form_callback';
     }
 
     // maintain hook's key
-    $sort_options[$type]['hook_key'] = $type;
+    $sort_options[$hook_key]['hook_key'] = $hook_key;
   }
 
   // sort them by title

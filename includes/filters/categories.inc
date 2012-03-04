@@ -11,7 +11,7 @@ function qw_filter_categories($filters){
     'description' => 'Select which categories to pull posts from, and how to treat those categories.',
     'form_callback' => 'qw_filter_categories_form',
     'query_args_callback' => 'qw_filter_categories_args',
-    'query_display_types' => array('page','widget'),
+    'allowed_query_types' => array('page','widget'),
   );
   return $filters;
 }
@@ -20,11 +20,11 @@ function qw_filter_categories($filters){
  * Convert values into query args
  */
 function qw_filter_categories_args(&$args, $filter){
-  if($filter['cat_operator'] == 'cat' && is_array($filter['cats'])){
-    $args[$filter['cat_operator']] = implode(",", array_keys($filter['cats']));
+  if($filter['values']['cat_operator'] == 'cat' && is_array($filter['values']['cats'])){
+    $args[$filter['values']['cat_operator']] = implode(",", array_keys($filter['values']['cats']));
   }
   else {
-    $args[$filter['cat_operator']] = $filter['cats'];
+    $args[$filter['values']['cat_operator']] = $filter['values']['cats'];
   }
 }
 

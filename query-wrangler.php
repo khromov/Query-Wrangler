@@ -35,6 +35,8 @@ define('QW_PLUGIN_DIR', dirname(__FILE__));
 define('QW_PLUGIN_URL', plugins_url( '', __FILE__ ));
 define('QW_DEFAULT_THEME', 'views');
 
+$_SESSION['qw']['time']['load']['start'] = microtime(1);
+
 // Query Widget
 include_once QW_PLUGIN_DIR.'/widget.query.php';
 
@@ -68,16 +70,18 @@ function qw_init_frontend(){
 
   // basic settings
   include_once QW_PLUGIN_DIR.'/includes/basics/display_title.inc';
-  include_once QW_PLUGIN_DIR.'/includes/basics/empty.inc';
-  include_once QW_PLUGIN_DIR.'/includes/basics/footer.inc';
-  include_once QW_PLUGIN_DIR.'/includes/basics/header.inc';
-  include_once QW_PLUGIN_DIR.'/includes/basics/offset.inc';
-  include_once QW_PLUGIN_DIR.'/includes/basics/pager_types.inc';
-  include_once QW_PLUGIN_DIR.'/includes/basics/post_status.inc';
-  include_once QW_PLUGIN_DIR.'/includes/basics/posts_per_page.inc';
-  include_once QW_PLUGIN_DIR.'/includes/basics/row_styles.inc';
   include_once QW_PLUGIN_DIR.'/includes/basics/template_styles.inc';
+  include_once QW_PLUGIN_DIR.'/includes/basics/row_styles.inc';
+  include_once QW_PLUGIN_DIR.'/includes/basics/posts_per_page.inc';
+  include_once QW_PLUGIN_DIR.'/includes/basics/offset.inc';
+  include_once QW_PLUGIN_DIR.'/includes/basics/post_status.inc';
+  include_once QW_PLUGIN_DIR.'/includes/basics/header.inc';
+  include_once QW_PLUGIN_DIR.'/includes/basics/footer.inc';
+  include_once QW_PLUGIN_DIR.'/includes/basics/empty.inc';
   include_once QW_PLUGIN_DIR.'/includes/basics/wrapper_settings.inc';
+  include_once QW_PLUGIN_DIR.'/includes/basics/pagers.inc';
+  include_once QW_PLUGIN_DIR.'/includes/basics/page_path.inc';
+  include_once QW_PLUGIN_DIR.'/includes/basics/page_template.inc';
 
   // fields
   include_once QW_PLUGIN_DIR.'/includes/fields/author.inc';
@@ -132,6 +136,8 @@ function qw_init(){
       }
     }
   }
+
+$_SESSION['qw']['time']['load']['end'] = microtime(1);
 }
 
 /*
@@ -212,3 +218,19 @@ function qw_query_override_terms_table(){
   dbDelta($sql);
 }
 register_activation_hook(__FILE__,'qw_query_override_terms_table');
+
+/*
+ * See the output time for a query
+ */
+function qw_debug_query_time(){
+  $output = '';
+  if (is_array($_SESSION['qw']['time'])){
+    $time = $_SESSION['qw']['time'];
+    foreach ($time as $k => $v){
+      $math = round($v['end'] - $v['start'], 3);
+      $output.= "<div>".$k." took ".$math."s</div>";
+    }
+  }
+
+  print $output;
+}

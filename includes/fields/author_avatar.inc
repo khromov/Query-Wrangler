@@ -29,14 +29,15 @@ function qw_field_author_avatar_form($field)
            name="<?php print $field['form_prefix']; ?>[size]"
            value="<?php print $field['values']['size']; ?>" />
     (pixel width)
-  <p>
+    <p class="description">Set the size of the avatar.  Defaults to 96, max size is 512.</p>
+  <div>
     <label class='qw-field-checkbox'>
       <input type='checkbox'
              name='<?php print $field['form_prefix']; ?>[link_to_author]'
              <?php print $link_selected; ?> />
       Link to author page (list of author posts)
     </label>
-  </p>
+  </div>
   <?php
 }
 

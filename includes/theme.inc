@@ -224,6 +224,10 @@ function qw_process_exposed_handlers($options){
     foreach($options['args']['sorts'] as $name => $sort) {
       if ($sort['is_exposed']){
         $exposed_sorts[$name] = $all_sorts[$sort['hook_key']];
+        // override exposed_key
+        if (!empty($sort['exposed_key'])) {
+          $exposed_sorts[$name]['exposed_key'] = $sort['exposed_key'] ;
+        }
         $exposed_sorts[$name]['values'] = $sort;
       }
     }
@@ -234,6 +238,10 @@ function qw_process_exposed_handlers($options){
     foreach($options['args']['filters'] as $name => $filter) {
       if ($filter['is_exposed']){
         $exposed_filters[$name] = $all_filters[$filter['hook_key']];
+        // override exposed_key
+        if (!empty($filter['exposed_key'])) {
+          $exposed_filters[$name]['exposed_key'] = $filter['exposed_key'] ;
+        }
         $exposed_filters[$name]['values'] = $filter;
       }
     }

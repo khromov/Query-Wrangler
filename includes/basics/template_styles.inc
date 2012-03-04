@@ -10,7 +10,7 @@ add_filter('qw_styles', 'qw_template_styles_default');
 function qw_basic_settings_style($basics){
   $basics['style'] = array(
     'title' => 'Template Style',
-    'option_type' => 'display',
+    'type' => 'display',
     'description' => 'How should this query be styled?',
     'form_callback' => 'qw_basic_settings_style_form',
     'weight' => 0,
@@ -52,7 +52,7 @@ function qw_template_styles_default($styles)
 /*
  * Form for template style and settings
  */
-function qw_basic_settings_style_form($basic, $display)
+function qw_basic_settings_style_form($basic, $options)
 {
   $styles = qw_all_styles();
   ?>
@@ -64,7 +64,7 @@ function qw_basic_settings_style_form($basic, $display)
         {
           ?>
             <option value="<?php print $type; ?>"
-                    <?php if($display['style'] == $type) { print 'selected="selected"';} ?>>
+                    <?php if($options['display']['style'] == $type) { print 'selected="selected"';} ?>>
               <?php print $style['title']; ?>
             </option>
           <?php
@@ -79,7 +79,7 @@ function qw_basic_settings_style_form($basic, $display)
         foreach($styles as $type => $style){
           if (function_exists($style['settings_callback']))
           {
-            $style['values'] = $display[$style['settings_key']];
+            $style['values'] = $options['display'][$style['settings_key']];
             ?>
             <div id="tab-style-settings-<?php print $style['hook_key']; ?>" class="qw-query-content">
               <span class="qw-setting-header"><?php print $style['title']; ?> Settings</span>

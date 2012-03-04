@@ -41,7 +41,8 @@
         <?php
       }
 
-      if(isset($filter['exposed_settings_form']) && function_exists($filter['exposed_settings_form']))
+      // exposed form and settings
+      if(isset($filter['exposed_form']))
       {
         $is_exposed = ($filter['values']['is_exposed']) ? 'checked="checked"': '';
         ?>
@@ -64,7 +65,8 @@
           </div>
           <div>
             <label class="qw-label">Exposed Description:</label>
-            <input type="text"
+            <input class="qw-text-long"
+                   type="text"
                    name='<?php print $filter['form_prefix']; ?>[exposed_desc]'
                    value="<?php print $filter['values']['exposed_desc']; ?>" />
             <p class="description">Useful for providing help text to a user.</p>
@@ -76,13 +78,11 @@
                    value="<?php print $filter['values']['exposed_key']; ?>" />
             <p class="description">URL ($_GET) key for the filter.  Useful for multiple forms on a single page.</p>
           </div>
-          <div class="qw-exposed-settings-form">
-            <?php
-              ob_start();
-                $filter['exposed_settings_form']($filter);
-              print ob_get_clean();
-            ?>
-          </div>
+          <?php if ($filter['exposed_settings_form']){ ?>
+            <div class="qw-exposed-settings-form">
+              <?php print $filter['exposed_settings_form']; ?>
+            </div>
+          <?php } ?>
         </div>
         <?php
       }

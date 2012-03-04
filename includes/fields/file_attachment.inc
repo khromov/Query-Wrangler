@@ -51,8 +51,8 @@ function qw_field_file_attachment_form($field)
            type="text"
            name='<?php print $field['form_prefix']; ?>[file_display_count]'
            value="<?php print ($field['values']['file_display_count']) ? $field['values']['file_display_count']: 0;?>" />
-
-    <p>
+    <p class="description">Number of files to show.  Use 0 (zero) to show all attached files.</p>
+    <div>
       <label class="qw-label">File Display Style:</label>
       <select name='<?php print $field['form_prefix']; ?>[file_display_style]'>
         <?php
@@ -65,7 +65,8 @@ function qw_field_file_attachment_form($field)
           }
         ?>
       </select>
-    </p>
+      <p class="description">Select how the file should be displayed.</p>
+    </div>
   <?php
 }
 
