@@ -180,9 +180,11 @@ function qw_settings_page()
  * Create Query Page
  */
 function qw_create_query() {
+  $wizards = qw_all_wizards();
+
   $args = array(
     'title' => 'Create Query',
-    'content' => theme('query_create')
+    'content' => theme('query_create', array('wizards' => $wizards))
   );
 
   print theme('admin_wrapper', $args);

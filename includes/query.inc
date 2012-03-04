@@ -106,8 +106,6 @@ function qw_generate_query_args($options = array(), $options_override = array())
   // standard arguments
   $args['posts_per_page'] = ($options['args']['posts_per_page']) ? $options['args']['posts_per_page']: 5;
   $args['offset']         = ($options['args']['offset']) ? $options['args']['offset']: 0;
-  //$args['orderby']        = ($options['args']['orderby']) ? $options['args']['orderby']: 'none';
-  //$args['order']          = ($options['args']['order']) ? $options['args']['order']: 'ASC';
   $args['paged']          = $options['args']['paged'];
   $args['post_status']    = $options['args']['post_status'];
 
@@ -126,10 +124,11 @@ function qw_generate_query_args($options = array(), $options_override = array())
         $sort = $temp;
 
         // override exposed key
-        if(empty($sort['values']['exposed_key'])){
-          $sort['exposed_key'] = 'exposed_'.$sort['name'];
-        } else {
+        if(!empty($sort['values']['exposed_key'])){
           $sort['exposed_key'] = $sort['values']['exposed_key'];
+        } else {
+          // default exposed key
+          $sort['exposed_key'] = 'exposed_'.$sort['values']['name'];
         }
       }
 
@@ -165,10 +164,11 @@ function qw_generate_query_args($options = array(), $options_override = array())
         $filter = $temp;
 
         // override exposed key
-        if(empty($filter['values']['exposed_key'])){
-          $filter['exposed_key'] = 'exposed_'.$filter['name'];
-        } else {
+        if(!empty($filter['values']['exposed_key'])){
           $filter['exposed_key'] = $filter['values']['exposed_key'];
+        } else {
+          // default exposed key
+          $filter['exposed_key'] = 'exposed_'.$filter['values']['name'];
         }
       }
 

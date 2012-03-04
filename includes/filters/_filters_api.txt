@@ -1,5 +1,3 @@
-TODO:
-// http://codex.wordpress.org/Function_Reference/get_taxonomies
 
 /*
  * Default Filters
@@ -19,11 +17,12 @@ TODO:
 
     // which types of queries to allow this filter on
     // some filters don't make sense on some query types
-    'query_display_types' => array('page','widget','override'),
+    'allowed_query_types' => array('page','widget','override'),
 
     // (optional) callback for form
     // * This or a template must be used
     // callback function should actually output the form
+    // @param $filter - the filter with ['values']
     'form_callback' => 'callback_function_form_inner_form',
 
     // (optional) template
@@ -37,26 +36,28 @@ TODO:
 
     // (optional) process the exposed filter's values into the query args
     // @param &$args - the arguments for the WP_Query
-    // @param $filter -
+    // @param $filter - the filter with ['values']
     'exposed_process' => 'qw_filter_exposed_process_post_id',
 
     // (optional) a form for gather settings for the exposed filter
     // expects html output
-    // @param $filter
+    // @param $filter - the filter with ['values']
     'exposed_settings_form' => 'qw_filter_exposed_settings_form_post_id',
 
     // (optional) the form exposed to a user above the query
     //  expects html output
-    // @param $filter -
+    // @param $filter - the filter with ['values']
     'exposed_form' => 'qw_filter_exposed_form_post_id',
   );
 
  */
-/************************************************************************************************
+
+
 /*
  * Filter's query_args_callbacks
  * These functions convert form data into WP_Query arguments
  */
+
 
 /*
  * Forms and Argument Callbacks
@@ -68,5 +69,5 @@ TODO:
  * Forms: return form output
  * Argument Callbacks: return the entire output of the filter
  *
- *   $filter: filter values
+ *   $filter['values']: filter values
  */

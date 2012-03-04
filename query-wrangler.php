@@ -98,6 +98,7 @@ function qw_init_frontend(){
   include_once QW_PLUGIN_DIR.'/includes/filters/post_parent.inc';
   include_once QW_PLUGIN_DIR.'/includes/filters/post_types.inc';
   include_once QW_PLUGIN_DIR.'/includes/filters/tags.inc';
+  include_once QW_PLUGIN_DIR.'/includes/filters/taxonomies.inc';
 
   // sort options
   include_once QW_PLUGIN_DIR.'/includes/sorts/sorts.inc';
@@ -114,6 +115,7 @@ $_SESSION['qw']['time']['load']['start'] = microtime(1);
     include_once QW_PLUGIN_DIR.'/admin/pages.inc';
     include_once QW_PLUGIN_DIR.'/admin/ajax.inc';
     include_once QW_PLUGIN_DIR.'/admin/editors.inc';
+    include_once QW_PLUGIN_DIR.'/admin/wizards.inc';
 
     add_action( 'wp_ajax_nopriv_qw_form_ajax', 'qw_form_ajax' );
     add_action( 'wp_ajax_qw_form_ajax', 'qw_form_ajax' );
@@ -133,6 +135,10 @@ $_SESSION['qw']['time']['load']['start'] = microtime(1);
       if(empty($_GET['edit'])){
         add_action( 'admin_enqueue_scripts', 'qw_admin_list_js' );
       }
+    }
+
+    if($_GET['page'] == 'qw-create'){
+      add_action( 'admin_enqueue_scripts', 'qw_admin_create_js' );
     }
   }
 

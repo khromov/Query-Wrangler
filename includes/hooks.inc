@@ -12,7 +12,7 @@ function qw_all_edit_themes(){
 function qw_all_basic_settings(){
   $basics = apply_filters('qw_basics', array());
 
-  foreach($basics as $hook_key => $basic){  
+  foreach($basics as $hook_key => $basic){
     if ($basic['type'] == 'page') {
       $basics[$hook_key]['form_prefix'] = 'qw-query-options[display]['.$basic['type'].']';
     }
@@ -213,4 +213,9 @@ function qw_all_pager_types(){
  */
 function qw_default_template_file() {
 	return apply_filters('qw_default_template_file','index.php');
+}
+
+function qw_all_wizards(){
+  $wizards = apply_filters('qw_wizards', array());
+  return $wizards;
 }

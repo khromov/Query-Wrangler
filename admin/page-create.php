@@ -22,6 +22,29 @@
       <p class="description">Query type determines how the query works within Wordpress.  View desriptions on the right.</p>
     </div>
 
+    <div class="qw-setting">
+      <label class="qw-label">Data Template:</label>
+      <select name="qw-data-wizard" id="qw-data-wizard">
+      <?php
+        foreach($wizards as $name => $wizard)
+        { ?>
+          <option value="<?php print $name; ?>"><?php print $wizard['title']; ?></option>
+          <?php
+        }
+      ?>
+      </select>
+      <p class="description">Choose the starting data for your query.</p>
+      <div id="wizard-descriptions">
+        <?php
+          foreach ($wizards as $name => $wizard)
+          { ?>
+            <p id="wizard-<?php print $name; ?>" class="description"><?php print $wizard['description']; ?></p>
+            <?php
+          }
+        ?>
+      </div>
+    </div>
+
     <div class="qw-create">
       <input type="submit" value="Create" class="button-primary" />
     </div>

@@ -15,12 +15,16 @@ add_filter('tw_templates', 'qw_admin_templates');
  */
 function qw_admin_templates($templates){
   // preview query
-  $templates['query_preview'] = array(
-    'files' => 'admin/page-preview.php',
+  $templates['preview_wrapper'] = array(
+    'files' => 'admin/preview.php',
+    'default_path' => QW_PLUGIN_DIR,
+  );
+  $templates['preview_ajax'] = array(
+    'files' => 'admin/preview-ajax.inc',
     'default_path' => QW_PLUGIN_DIR,
     'arguments' => array('options' => NULL),
   );
-  
+
   // edit query template
   $templates['query_edit'] = array(
     'files' => 'admin/editors/[theme]/[theme]-editor.php',
@@ -34,6 +38,9 @@ function qw_admin_templates($templates){
   $templates['query_create'] = array(
     'files' => 'admin/page-create.php',
     'default_path' => QW_PLUGIN_DIR,
+    'arguments' => array(
+      'wizards' => array(),
+    )
   );
 
   // import query template

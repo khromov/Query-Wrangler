@@ -9,12 +9,24 @@ function qw_insert_new_query($post){
   global $wpdb;
   $table_name = $wpdb->prefix."query_wrangler";
 
+  // wizard data
+  $wizards = qw_all_wizards();
+  if (isset($wizards[$post['qw-data-wizard']]) &&
+      function_exists($wizards[$post['qw-data-wizard']]['data_callback']))
+  {
+    $wizard = $wizards[$post['qw-data-wizard']];
+    $data = $wizard['data_callback']();
+  }
+  else {
+    $data = qw_wizard_default_data();
+  }
+
   $values = array(
     'name' => $post['qw-name'],
     'slug' => qw_make_slug($post['qw-name']),
     'type' => $post['qw-type'],
     'path' => ($post['page-path']) ? urlencode($post['page-path']) : NULL,
-    'data' => qw_serialize(qw_default_query_data()),
+    'data' => qw_serialize($data),
   );
 
   $wpdb->insert($table_name, $values);
@@ -168,31 +180,6 @@ function qw_query_import($post){
 }
 
 /*
- * Default values for  new query
- *
- * @return array Default query settings
- */
-function qw_default_query_data(){
-  return array(
-    'args' => array(
-      'posts_per_page'  => 5,
-      'offset'          => 0,
-      'cat_operator'    => 'cat',
-      'post_status'     => 'publish',
-      'filters'         => array(),
-      'sorts'           => array(),
-    ),
-    'display' => array(
-      'style' => 'unformatted',
-      'row_style' => 'posts',
-      'post_settings' => array(
-        'size' => 'complete',
-      ),
-    ),
-  );
-}
-
-/*
  * Generate form prefixes for handlers
  *
  * @param string
@@ -255,6 +242,13 @@ function qw_admin_css(){
 function qw_admin_list_js(){
   wp_enqueue_script('qw-admin-list-js',
                   plugins_url('/admin/js/query-wrangler-list.js', dirname(__FILE__)),
+                  array(),
+                  QW_VERSION);
+}
+// admin create page
+function qw_admin_create_js(){
+  wp_enqueue_script('qw-admin-create-js',
+                  plugins_url('/admin/js/query-wrangler-create.js', dirname(__FILE__)),
                   array(),
                   QW_VERSION);
 }

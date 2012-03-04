@@ -160,6 +160,10 @@ a.toplevel_page_query-wrangler {
   border-top: 1px solid #bbb;
   background-color: #efefef;
 }
+#wizard-descriptions {
+  border: 1px dashed #bbb;
+  padding: 3px;
+}
 #qw-settings-page {
   border: 1px solid #444;
   padding: 1em 2em;

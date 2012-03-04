@@ -23,7 +23,7 @@ function qw_basic_settings_posts_per_page_form($basic, $options)
     <input class="qw-text-short"
            type="text"
            name="<?php print $basic['form_prefix']; ?>[posts_per_page]"
-           value="<?php print $otions['args']['posts_per_page']; ?>" />
+           value="<?php print $options['args']['posts_per_page']; ?>" />
     <p class="description"><?php print $basic['description']; ?></p>
   <?php
 }

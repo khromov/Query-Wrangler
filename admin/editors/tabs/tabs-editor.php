@@ -372,47 +372,5 @@
 
         <div class="qw-clear-gone"><!-- ie hack -->&nbsp;</div>
 
-
-<!-- Preview -->
-  <div id="query-preview" class="ui-widget ui-widget-content ui-corner-all">
-    <div id="query-preview-controls" class="query-preview-inactive">
-      <div id="get-preview" class="qw-button">Preview</div>
-    </div>
-
-    <h4 id="preview-title" class="ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">Preview Query</h4>
-    <p class="description">This preview does not include your theme's CSS stylesheet.</p>
-    <div id="query-preview-target">
-      <!-- preview -->
-    </div>
-
-    <div class="qw-clear-gone"><!-- ie hack -->&nbsp;</div>
-
-    <div id="query-details">
-      <div class="group">
-        <div class="qw-setting-header">WP_Query Arguments</div>
-        <div id="qw-show-arguments-target">
-          <!-- args -->
-        </div>
-      </div>
-      <div class="group">
-        <div class="qw-setting-header">Display Settings</div>
-        <div id="qw-show-display-target">
-          <!-- display -->
-        </div>
-      </div>
-      <div class="group">
-        <div class="qw-setting-header">Resulting WP_Query Object</div>
-        <div id="qw-show-wpquery-target">
-          <!-- WP_Query -->
-        </div>
-      </div>
-      <div class="group">
-        <div class="qw-setting-header">Query Time</div>
-        <div id="qw-show-query-time">
-          <!-- Query Time -->
-        </div>
-      </div>
-    </div>
-
-  </div>
+  <?php print theme('preview_wrapper'); ?>
 </form>

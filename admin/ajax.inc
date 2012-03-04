@@ -18,7 +18,7 @@ function qw_form_ajax()
         'options' => $options['qw-query-options'],
         'query_id' => $_POST['query_id'],
       );
-      print theme('query_preview', $args);
+      print theme('preview_ajax', $args);
       exit;
       break;
 
