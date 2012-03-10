@@ -4,8 +4,6 @@
 QueryWrangler.current_form_id = '';
 QueryWrangler.new_form_id = '';
 QueryWrangler.form_backup = '';
-// array of available options for looping
-QueryWrangler.handlers = ['field','filter','sort'];
 // changes have been made
 QueryWrangler.changes = false;
 
@@ -24,6 +22,7 @@ QueryWrangler.get_preview = function() {
     'options': QueryWrangler.form_backup,
     'query_id': QueryWrangler.query.id
   };
+  
   // make ajax call
   jQuery.ajax({
     url: QueryWrangler.ajaxForm,
@@ -32,7 +31,6 @@ QueryWrangler.get_preview = function() {
     data: post_data_form,
     dataType: 'json',
     success: function(results){
-      console.log(results);
       jQuery('#query-preview-target').html(results.preview);
       jQuery('#qw-show-arguments-target').html(results.args);
       jQuery('#qw-show-display-target').html(results.display);

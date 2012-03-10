@@ -16,6 +16,62 @@ function qu_upgrade_12_to_current(){
 }
 
 /*
+ * Upgrade from 1.5 to 1.6
+ */
+function qw_upgrade_15_to_16()
+{
+  // get all queries
+  global $wpdb;
+  $table = $wpdb->prefix."query_wrangler";
+  $sql = "SELECT * FROM ".$table;
+
+  $rows = $wpdb->get_results($sql);
+
+  // loop through queries
+  foreach($rows as $query){
+    $data = qw_unserialize($query->data);
+
+    // new data targets
+    $data['display']['style_settings'] = array();
+    $data['display']['row_style_settings'] = array();
+    $data['display']['fields'] = array();
+
+    // [display][slideshow_settings] -> [display][style_settings][slideshow]
+    if (isset($data['display']['slideshow_settings'])){
+      $data['display']['style_settings']['slideshow'] = $data['display']['slideshow_settings'];
+      unset($data['display']['slideshow_settings']);
+    }
+
+    // [display][post_settings] -> [display][row_style_settings][posts]
+    if (isset($data['display']['post_settings'])){
+      $data['display']['row_style_settings']['posts'] = $data['display']['post_settings'];
+      unset($data['display']['post_settings']);
+    }
+
+    // [display][field_settings][fields] -> [display][fields]
+    if (isset($data['display']['field_settings']['fields'])){
+      $data['display']['fields'] = $data['display']['field_settings']['fields'];
+      unset($data['display']['field_settings']);
+    }
+
+    // [display][override] = [args][contextual_filters]
+      // ['do_override'] = 'on';
+
+    // move all override values to the new override table
+
+    // save query
+    $update = array(
+      'data' => qw_serialize($data),
+    );
+    $where = array(
+      'id' => $query->id,
+    );
+    $wpdb->update($table, $update, $where);
+  }
+
+  // drop old override table
+}
+/*
  * Upgrade from 1.4 to 1.5
  */
 function qw_upgrade_14_to_15()
@@ -79,6 +135,8 @@ function qw_upgrade_14_to_15()
     );
     $wpdb->update($table, $update, $where);
   }
+  // continue upgrades
+  qw_upgrade_15_to_16();
 }
 
 /*

@@ -16,7 +16,7 @@ QueryWrangler.restore_form = function(dialog){
 QueryWrangler.get_handler_templates = function(handler, handler_hook, item_type){
   var item_count = jQuery('#qw-options-forms input.qw-'+handler+'-type[value='+item_type+']').length;
   var next_name = (item_count > 0) ? item_type + "_" + item_count: item_type;
-  var next_weight = jQuery('ul#qw-'+handler+'s-sortable li').length;
+  var next_weight = jQuery('ul#qw-'+handler+'-sortable li').length;
 
   // prepare post data for form and sortable form
   var post_data_form = {
@@ -48,26 +48,15 @@ QueryWrangler.get_handler_templates = function(handler, handler_hook, item_type)
   return next_name;
 }
 QueryWrangler.add_list_item = function(post_data_form){
-  var title ;
-  switch(post_data_form.handler){
-    case 'field':
-      title = QueryWrangler.allFields[post_data_form.hook_key].title;
-      break;
-    case 'filter':
-      title = QueryWrangler.allFilters[post_data_form.hook_key].title;
-      break;
-    case 'sort':
-      title = QueryWrangler.allSortOptions[post_data_form.hook_key].title;
-      break;
-  }
-
+  
+  var title = QueryWrangler.allHandlers[post_data_form.handler].all_items[post_data_form.hook_key].title;
 
   var output = "<div class='qw-query-title' title='qw-"+post_data_form.handler+"-"+post_data_form.name+"'>";
   output    +=   "<span class='qw-setting-title'>"+title+"</span> : ";
   output    +=   "<span class='qw-setting-value'>"+post_data_form.name+"</span>";
   output    += "</div>";
 
-  jQuery('#qw-query-'+post_data_form.handler+'s-list').append(output);
+  jQuery('#qw-query-'+post_data_form.handler+'-list').append(output);
 }
 /*
  * Dynamically set the setting title for updated fields
@@ -81,7 +70,7 @@ QueryWrangler.set_setting_title = function(){
   var title_target = settings.children('.qw-setting-value');
 
   // fields
-  if(settings.parent().attr('id') == 'qw-query-fields-list'){
+  if(settings.parent().attr('id') == 'qw-query-field-list'){
     new_title.push(form.find('input.qw-field-name').val());
   }
 
@@ -135,7 +124,7 @@ QueryWrangler.set_setting_title = function(){
  */
 QueryWrangler.add_item = function(dialog){
   var handler = jQuery(dialog).children('input.add-handler-type').val();
-  jQuery('#qw-display-add-'+handler+'s input[type=checkbox]')
+  jQuery('#qw-display-add-'+handler+' input[type=checkbox]')
     .each(function(index,element){
       if(jQuery(element).is(':checked')){
         // item type
@@ -186,7 +175,7 @@ QueryWrangler.button_update = function(dialog){
 
   // handlers have special needs
   jQuery.each(QueryWrangler.handlers, function(i,handler){
-    if (form.attr('id') == 'qw-display-add-'+handler+'s'){
+    if (form.attr('id') == 'qw-display-add-'+handler+''){
       is_handler = true;
       return;
     }
@@ -244,6 +233,7 @@ QueryWrangler.sortable_list_build = function(element){
       modal: true,
       width: '60%',
       height: 440,
+      resizable: false,
       title: jQuery(element).text(),
       close: function() {
         QueryWrangler.sortable_list_destroy(this);
@@ -263,6 +253,7 @@ QueryWrangler.sortable_list_build = function(element){
     });
 }
 QueryWrangler.sortable_list_destroy = function(dialog){
+  jQuery(dialog).html('');
   jQuery(dialog).dialog('destroy');
 }
 
@@ -275,7 +266,7 @@ QueryWrangler.sortable_list_update = function(dialog){
   var items = jQuery(dialog).children('.qw-sortable');
   jQuery(items).each(function(i, item){
     // repopulate list
-    jQuery('#'+list_id).append('<div>'+jQuery(item).html()+'</div>');
+    jQuery('#'+list_id).append(jQuery(item).html());
 
     // update weight
     var form_id = jQuery(item).children('.qw-query-title').attr('title');
@@ -287,7 +278,7 @@ QueryWrangler.sortable_list_update = function(dialog){
 }
 QueryWrangler.sortable_list_update_weights = function(list_id){
   jQuery(QueryWrangler.handlers).each(function(i, handler){
-    jQuery("#existing-"+handler+"s .qw-"+handler)
+    jQuery('#existing-'+handler+'s .qw-'+handler)
       .each(function(i){
         jQuery(this).find(".qw-weight").attr('value', i);
         jQuery(this).find(".qw-weight").val(i);

@@ -100,8 +100,10 @@ function qw_generate_query_options($query_id, $options_override = array(), $full
  */
 function qw_generate_query_args($options = array(), $options_override = array())
 {
-  $all_filters = qw_all_filters();
-  $all_sorts = qw_all_sort_options();
+  // combine options
+  $options =  array_merge_recursive((array)$options, $options_override);
+
+  $handlers = qw_preprocess_handlers($options);
 
   // standard arguments
   $args['posts_per_page'] = ($options['args']['posts_per_page']) ? $options['args']['posts_per_page']: 5;
@@ -111,79 +113,38 @@ function qw_generate_query_args($options = array(), $options_override = array())
 
   $submitted_data = qw_exposed_submitted_data();
 
-  // handle sorts
-  if(is_array($options['args']['sorts'])){
-
-    foreach($options['args']['sorts'] as $sort)
-    {
-      // combine sort details
-      $hook_key = qw_get_hook_key($all_sorts, $sort);
-      if (isset($all_sorts[$hook_key])){
-        $temp = $all_sorts[$hook_key];
-        $temp['values'] = $sort;
-        $sort = $temp;
-
-        // override exposed key
-        if(!empty($sort['values']['exposed_key'])){
-          $sort['exposed_key'] = $sort['values']['exposed_key'];
-        } else {
-          // default exposed key
-          $sort['exposed_key'] = 'exposed_'.$sort['values']['name'];
+  foreach ($handlers as $handler_type => $handler){
+    if (is_array($handler['items'])){
+      foreach($handler['items'] as $name => $item)
+      {
+        // Exposed items
+        if (isset($item['exposed_form'])){
+          if(!empty($item['values']['exposed_key'])){
+            // override exposed key
+            $item['exposed_key'] = $item['values']['exposed_key'];
+          } else {
+            // default exposed key
+            $item['exposed_key'] = 'exposed_'.$item['values']['name'];
+          }
         }
-      }
 
-      // look for callback, and run it
-      if (isset($sort['query_args_callback']) && function_exists($sort['query_args_callback'])){
-        $value = $submitted_data[$sort['exposed_key']];
-        $sort['query_args_callback']($args, $sort, $value);
-      } else {
-        // else, default to type as WP_Query argument key
-        // arguments passed to query
-        $args[$sort['orderby_key']] = $sort['type'];
-        $args[$sort['order_key']] = $sort['values']['order_value'];
-      }
-
-      // exposed sorts
-      if(isset($sort['exposed_process']) && function_exists($sort['exposed_process'])){
-        $value = $submitted_data[$sort['exposed_key']];
-        $sort['exposed_process']($args, $sort, $value);
-      }
-    }
-  }
-
-  // handle filters
-  if(is_array($options['args']['filters'])){
-    // loop through all filters
-    foreach($options['args']['filters'] as $filter)
-    {
-      // combine filter details
-      $hook_key = qw_get_hook_key($all_filters, $filter);
-      if (isset($all_filters[$hook_key])){
-        $temp = $all_filters[$hook_key];
-        $temp['values'] = $filter;
-        $filter = $temp;
-
-        // override exposed key
-        if(!empty($filter['values']['exposed_key'])){
-          $filter['exposed_key'] = $filter['values']['exposed_key'];
-        } else {
-          // default exposed key
-          $filter['exposed_key'] = 'exposed_'.$filter['values']['name'];
+        // Alter the query args
+        // look for callback, and run it
+        if (isset($item['query_args_callback']) && function_exists($item['query_args_callback'])){
+          $item['query_args_callback']($args, $item);
+        } else if (isset($item['orderby_key']) && isset($item['order_key'])){
+          // else, default to type as WP_Query argument key
+          // arguments passed to query
+          $args[$item['orderby_key']] = $item['type'];
+          $args[$item['order_key']] = $item['values']['order_value'];
         }
-      }
 
-      // look for callback, and run it
-      if (isset($filter['query_args_callback']) && function_exists($filter['query_args_callback'])){
-        $filter['query_args_callback']($args, $filter, $value);
-      } else {
-        // else, default to type as WP_Query argument key
-        $args[$filter['type']] = $filter['values'][$filter['type']];
-      }
-
-      // exposed filters
-      if(isset($filter['exposed_process']) && function_exists($filter['exposed_process'])){
-        $value = $submitted_data[$filter['exposed_key']];
-        $filter['exposed_process']($args, $filter, $value);
+        // Process submitted exposed values
+        // exposed items
+        if(isset($item['exposed_process']) && function_exists($item['exposed_process'])){
+          $value = $submitted_data[$item['exposed_key']];
+          $item['exposed_process']($args, $item, $value);
+        }
       }
     }
   }
@@ -213,6 +174,90 @@ function qw_exposed_submitted_data(){
     return $data;
   }
   return false;
+}
+/*
+ * Organize an existing filters and give it all the data they needs
+ *
+ * @param $type
+ *   handler-type = 'filter', 'field', 'sort'
+ */
+function qw_preprocess_handlers($options){
+  // build handlers data
+  $handlers = qw_all_handlers();
+  // Retrieve the handler items from the query array
+  foreach ($handlers as $k => $handler){
+    if (function_exists($handler['data_callback'])){
+      $handlers[$k]['items'] = $handler['data_callback']($options);
+    }
+  }
+
+  foreach($handlers as $type => $handler){
+    // load all our default handlers
+    if (is_array($handler['items']))
+    {
+      $all = $handler['all_items'];
+
+      // generate the form name prefixes
+      foreach($handler['items'] as $name => $values)
+      {
+        // load sort type data
+        $hook_key = qw_get_hook_key($all, $values);
+
+        $this_item = $all[$hook_key];
+
+        // move type, hook_key, and weight to top level of array
+        $this_item['type'] = $values['type']; unset($values['type']);
+        $this_item['weight'] = $values['weight']; unset($values['weight']);
+        $this_item['hook_key'] = $values['hook_key']; unset($values['hook_key']);
+
+        // values are own array
+        $this_item['values'] = $values;
+        $this_item['name'] = $name;
+        $this_item['form_prefix'] = $handler['form_prefix'].'['.$name.']';
+
+        qw_handler_make_form($this_item);
+
+        // set new item
+        $handlers[$type]['items'][$name] = $this_item;
+      }
+    }
+  }
+
+  // sort sorts according to weight
+  if(is_array($handler['items'])){
+    uasort($handler['items'], 'qw_cmp');
+  }
+
+  return $handlers;
+}
+
+/*
+ * Look for handler forms and settings forms and execute the callbacks
+ */
+function qw_handler_make_form(&$handler){
+  // this handler's form
+  if (function_exists($handler['form_callback'])){
+    ob_start();
+      $handler['form_callback']($handler);
+    $handler['form'] = ob_get_clean();
+  }
+  // provide template wrangler support
+  else if (isset($handler['form_template'])){
+    $handler['form'] = theme($handler['form_template'], array('this' => $handler));
+  }
+
+  // see if item has an exposed settings form
+  if (function_exists($handler['exposed_settings_form_callback'])) {
+    ob_start();
+      $handler['exposed_settings_form_callback']($handler);
+    $handler['exposed_settings_form'] = ob_get_clean();
+  }
+  // provide template wrangler support
+  else if (isset($handler['exposed_settings_form_template'])){
+    $handler['exposed_settings_form'] = theme($handler['exposed_settings_form_template'], array('this' => $handler));
+  }
+//  krumo($handler['title'].' - '.$handler['hook_key']);
+//krumo($handler);
 }
 /*
  * Get all queries of the type widget

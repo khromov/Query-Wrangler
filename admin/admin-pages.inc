@@ -1,5 +1,87 @@
 <?php
 
+// CSS
+function qw_admin_css(){
+  print '<link rel="stylesheet" type="text/css" href="'.QW_PLUGIN_URL.'/admin/css/jquery-ui.css" />';
+  print '<link rel="stylesheet" type="text/css" href="'.QW_PLUGIN_URL.'/admin/css/query-wrangler.css" />';
+}
+// admin list page
+function qw_admin_list_js(){
+  wp_enqueue_script('qw-admin-list-js',
+                  plugins_url('/admin/js/query-wrangler-list.js', dirname(__FILE__)),
+                  array(),
+                  QW_VERSION);
+}
+// admin create page
+function qw_admin_create_js(){
+  wp_enqueue_script('qw-admin-create-js',
+                  plugins_url('/admin/js/query-wrangler-create.js', dirname(__FILE__)),
+                  array(),
+                  QW_VERSION);
+}
+// Base JS
+function qw_admin_js(){
+  wp_enqueue_script('qw-admin-js',
+                  plugins_url('/admin/js/query-wrangler.js', dirname(__FILE__)),
+                  array('jquery-ui-core'),
+                  QW_VERSION);
+  // jquery unserialize form
+  wp_enqueue_script('qw-unserialize-form',
+                  plugins_url('/admin/js/jquery.unserialize-form.js', dirname(__FILE__)),
+                  array(),
+                  QW_VERSION);
+  $data = qw_edit_json();
+  wp_localize_script( 'qw-admin-js',
+                      'QueryWrangler',
+                      array(
+                        'l10n_print_after' => 'QueryWrangler = ' . $data. ';'
+                      )
+                    );
+}
+// Base Json data for query edit page
+function qw_edit_json(){
+  $handlers = qw_all_handlers();
+  $handler_types = array();
+  foreach($handlers as $type => $handler){
+    $handler_types[] = $type;
+  }
+  $data = array(
+    'handlers' => $handler_types,
+    'ajaxForm' => admin_url( 'admin-ajax.php' ),
+    'allHandlers' => $handlers,
+    'allFields' => $handlers['field']['all_items'],
+    'allFilters'  => $handlers['filter']['all_items'],
+    'allSortOptions' => $handlers['sort']['all_items'],
+    'allContextualFilters' => $handlers['contextual_filter']['all_items'],
+    'allStyles' => qw_all_styles(),
+    'allRowStyles' => qw_all_row_styles(),
+    'allPostTypes' => qw_all_post_types,
+    'allPagerTypes' => qw_all_pager_types(),
+    'allImageSizes' => get_intermediate_image_sizes(),
+    'allFileStyles' => qw_all_file_styles(),
+  );
+
+  // editing a query
+  if($query_id = $_GET['edit'])
+  {
+    // get the query
+    global $wpdb;
+    $table_name = $wpdb->prefix."query_wrangler";
+    $sql = "SELECT name,type,data,path FROM ".$table_name." WHERE id = ".$query_id." LIMIT 1";
+    $row = $wpdb->get_row($sql);
+
+    $additional_data['query'] = array(
+      'id' => $query_id,
+      'options' => qw_unserialize($row->data),
+      'name' => $row->name,
+      'type' => $row->type,
+    );
+
+    $data = array_merge($data, $additional_data);
+  }
+  return json_encode( $data ) ;
+}
+
 /*
  * Handle the display of pages and actions
  */
@@ -73,11 +155,9 @@ function qw_edit_query_form(){
 
   $options = qw_unserialize($row->data);
 
-  // preprocess existing handlers
-  $filters = qw_preprocess_handlers('filter', $options['args']['filters']);
-  $fields  = qw_preprocess_handlers('field', $options['display']['field_settings']['fields']);
-  $sorts   = qw_preprocess_handlers('sort', $options['args']['sorts']);
-
+  // handlers
+  $handlers = qw_preprocess_handlers($options);
+krumo($handlers);
   // basic settings
   $basics = qw_all_basic_settings();
 
@@ -90,6 +170,7 @@ function qw_edit_query_form(){
     }
   }
 
+  // editor theme
   $theme = get_option('qw_edit_theme');
   if($theme == ""){
     $theme = QW_DEFAULT_THEME;
@@ -110,24 +191,16 @@ function qw_edit_query_form(){
     'query_name' => $row->name,
     'query_type' => $row->type,
     'query_page_title' => $options['display']['title'],
-    'filters' => $filters,
-    'fields' => $fields,
-    'sorts' => $sorts,
+    'filters' => $handlers['filter']['items'],
+    'fields' => $handlers['field']['items'],
+    'sorts' => $handlers['sort']['items'],
     'basics' => $basics,
+    'handlers' => $handlers,
 
     // all datas
-    'post_statuses' => qw_all_post_statuses(),
-    'styles' => qw_all_styles(),
-    'row_styles' => qw_all_row_styles(),
-    'row_complete_styles' => qw_all_row_complete_styles(),
-    'page_templates' => get_page_templates(),
-    'post_types' => qw_all_post_types(),
-    'pager_types' => qw_all_pager_types(),
-    'category_ids' => get_all_category_ids(),
-    'tags' => get_tags(array('hide_empty' => false)),
-    'all_filters' => qw_all_filters(),
-    'all_fields' => qw_all_fields(),
-    'all_sorts' => qw_all_sort_options(),
+    'all_fields' => $handlers['field']['all_items'],
+    'all_filters'  => $handlers['filter']['all_items'],
+    'all_sorts' => $handlers['sort']['all_items'],
   );
 
   // Page Queries
@@ -166,7 +239,7 @@ function qw_settings_page()
 {
   $settings_args = array(
     'theme' => get_option('qw_edit_theme'),
-    'edit_themes' => qw_all_edit_themes(),
+    'edit_themes' => qw_all_editors(),
   );
   $args = array(
     'title' => 'Query Wrangler Settings',

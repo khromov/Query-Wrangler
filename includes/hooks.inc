@@ -1,9 +1,32 @@
 <?php
 /*
+ * All Handlers
+ *
+ * Handlers are groups of items that can be added and removed from a query
+ * eg: filters, sorts, fields
+ */
+function qw_all_handlers(){
+  $handlers = apply_filters('qw_handlers', array());
+  foreach ($handlers as $hook_key => $handler) {
+    $handlers[$hook_key]['hook_key'] = $hook_key;
+    // adjust form prefix
+    $handlers[$hook_key]['form_prefix'] = 'qw-query-options'.$handlers[$hook_key]['form_prefix'];
+    $handlers[$hook_key]['all_items'] = $handler['all_callback']();
+  }
+  return $handlers;
+}
+/*
+ * All contexts selectable on a context filter
+ */
+function qw_all_contexts(){
+  $contexts = apply_filters('qw_contexts',array());
+  return $contexts;
+}
+/*
  * Editor themes
  */
-function qw_all_edit_themes(){
-  $themes = apply_filters('qw_edit_themes', array());
+function qw_all_editors(){
+  $themes = apply_filters('qw_editors', array());
   return $themes;
 }
 /*
@@ -49,6 +72,37 @@ function qw_all_fields(){
   array_multisort($titles, SORT_ASC, $fields);
 
   return $fields;
+}
+
+/*
+ * contextual_filters Hook
+ */
+function qw_all_contextual_filters(){
+  $contextual_filters = apply_filters('qw_contextual_filters', array());
+
+  foreach($contextual_filters as $hook_key => $contextual_filter){
+    // set contextual_filter's type as a value if not provided by contextual_filter
+    if(!isset($contextual_filter['type'])){
+      $contextual_filters[$hook_key]['type'] = $hook_key;
+    }
+
+    // set default query types to all
+    if (!isset($contextual_filter['allowed_query_types'])){
+      $contextual_filters[$hook_key]['allowed_query_types'] = array('page','widget','override');
+    }
+
+    // maintain the hook's key
+    $contextual_filters[$hook_key]['hook_key'] = $hook_key;
+  }
+
+  // sort them by title
+  $titles = array();
+  foreach ($contextual_filters as $key => $contextual_filter) {
+    $titles[$key] = $contextual_filter['title'];
+  }
+  array_multisort($titles, SORT_ASC, $contextual_filters);
+
+  return $contextual_filters;
 }
 
 /*

@@ -28,7 +28,7 @@
     <input class='qw-weight'
            name='qw-query-options[args][sorts][<?php print $sort['name']; ?>][weight]'
            type='text' size='2'
-           value='<?php print $weight; ?>' />
+           value='<?php print $sort['weight']; ?>' />
 
     <p class="description"><?php print $sort['description']; ?></p>
 

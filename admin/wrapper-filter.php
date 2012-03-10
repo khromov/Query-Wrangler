@@ -28,7 +28,7 @@
     <input class='qw-weight'
            name='<?php print $filter['form_prefix']; ?>[weight]'
            type='text' size='2' tabindex="9999"
-           value='<?php print $weight; ?>' />
+           value='<?php print $filter['weight']; ?>' />
 
     <p class="description"><?php print $filter['description']; ?></p>
 

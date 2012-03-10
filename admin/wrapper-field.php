@@ -35,7 +35,7 @@
     <input class='qw-weight'
            name='qw-query-options[display][field_settings][fields][<?php print $field['name']; ?>][weight]'
            type='text' size='2'
-           value='<?php print $weight; ?>' />
+           value='<?php print $field['weight']; ?>' />
 
     <p class="description"><?php print $field['description']; ?></p>
 

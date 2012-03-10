@@ -34,6 +34,9 @@ function qw_get_page_op()
   else if (is_tag() || !empty($wp_query->query_vars['tag'])){
     $op = 'tag';
   }
+  else if (is_tax() || !empty($wp_query->query_vars['taxonomy'])){
+    $op = 'tax';
+  }
   else if (is_home()){
     $op = 'home';
   }
@@ -82,19 +85,22 @@ add_action('wp', 'qw_query_pages_handler');
  */
 function qw_query_pages_handler()
 {
-  global $wp_query,$wpdb;
+  // don't override admin pages.... for now, whawhawha
+  if (is_admin()){
+    return;
+  }
 
+  global $wp_query,$wpdb;
+  $handled_ops = array('category', 'tag', 'tax', '404');
+  
   // page op is based on WP tags like is_category() && is_404()
   $op = qw_get_page_op();
 
   // we only handle sepcific types of pages and overrides
-  if($op == 'category' ||
-     $op == 'tag' ||
-     $op == '404')
+  if(in_array($op, $handled_ops))
   {
-
     $qw_table = $wpdb->prefix."query_wrangler";
-    $qot_table = $wpdb->prefix."query_override_terms";
+    $qo_table = $wpdb->prefix."query_overrides";
 
     // We'll need to override query options
     $options_override = array();
@@ -111,75 +117,41 @@ function qw_query_pages_handler()
     /*
      * 404 -> Query type = Page
      */
-    if($op == '404')
-    {
-      // include Template Wrangler
-      if(!function_exists('theme')){
-        include_once QW_PLUGIN_DIR.'/template-wrangler.inc';
-      }
-
+    if($op == '404'){
       // take into account trailing slash
-      if(substr($path, strlen($path)-1, 1) != '/'){
-        $alt_path = $path.'/';
-      } else {
-        $alt_path = substr($path, 0, strlen($path)-1);
+      if(substr($path, strlen($path)-1, 1) == '/'){
+        $path = rtrim($path, '/');
       }
 
       // Look for the query path given
-      $sql = "SELECT id,name,path,data FROM ".$qw_table." WHERE type = 'page' AND (path = '".$path."' OR path = '".$alt_path."')";
+      $sql = "SELECT id,name,path,data FROM ".$qw_table." WHERE type = 'page' AND path = '".$path."'";
+      $query = $wpdb->get_row($sql);
     }
 
     /*
      * Category & Tag -> Query type = Override
      */
-    if($op == 'category' ||
-       $op == 'tag')
-    {
-      // get first term
-      if($op == 'category') {
-        // drill down to the actually term
-        if ($term = get_query_var('category_name')) {
-          if(is_array($term)){
-             $term = array_pop($term);
-          }
-          $term = qw_get_term($term, 'slug');
-          // override options
-          $options_override['args']['filters']['categories']['type'] = 'categories';
-          $options_override['args']['filters']['categories']['cat_operator'] = 'cat';
-          $options_override['args']['filters']['categories']['cats'] = array($term->term_id => $term->name);
-        }
-      }
-      else if ($op == 'tag'){
-        // drill down to the actually term
-        if ($term = get_query_var('tag')){
-          if (is_array($term)){
-            $term = array_pop($terms);
-          }
-          $term = qw_get_term($term, 'slug');
-          // override options
-          $options_override['args']['filters']['tags']['type'] = 'tags';
-          $options_override['args']['filters']['tags']['tag_operator'] = 'tag__in';
-          $options_override['args']['filters']['tags']['tags'] = array($term->term_id => $term->name);
-        }
-      }
+    // get query by contextual filter
+    $handlers = qw_all_handlers();
+    foreach ($handlers['contextual_filter']['all_items'] as $item){
+      if ($item['query_op'] == $op){
+        $override_id = $item['query_override_id_callback']($item);
 
-      // build the term query
-      if(isset($term)){
-        $sql = "SELECT qw.id,qw.name,qw.slug,qw.type,qw.data
+        // get potential query
+        $sql = "SELECT qw.id, qw.data
                 FROM ".$qw_table." as qw
-                LEFT JOIN ".$qot_table." as ot ON ot.query_id = qw.id
-                WHERE qw.type = 'override' AND ot.term_id = ".$term->term_id."
+                LEFT JOIN ".$qo_table." as qo ON qo.query_id = qw.id
+                WHERE qo.override_id = '".$override_id."'
+                  AND qo.override_hook = '".$item['hook_key']."'
                 LIMIT 1";
+        if ($query = $wpdb->get_row($sql)){
+          break;
+        }
       }
-    }
-
-    // see if we have a query
-    if(isset($sql)) {
-      $rows = $wpdb->get_results($sql);
     }
 
     // got results for a query
-    if(is_object($rows[0]) && $query = $rows[0])
+    if (isset($query))
     {
 $_SESSION['qw']['time']['page_load']['start'] = microtime(1);
       // pass the paged value into the query

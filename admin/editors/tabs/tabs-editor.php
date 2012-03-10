@@ -179,117 +179,14 @@
     }
   ?>
 
-<!-- fields -->
-    <div id="tabs-fields" class="qw-query-admin-tabs">
-      <div class="qw-query-add-titles qw-setting">
-        <span class="qw-query-title button" title="qw-display-add-fields">
-          Add Fields
-        </span>
-      </div>
-      <p class="description">Click to change settings.  Drag and drop the fields to change their order.</p>
+<?php
+  $handler_types = array('field', 'filter', 'sort');
 
-      <!-- edit fields -->
-      <div id="existing-fields" class="qw-sortable-list">
-        <?php
-          if(is_array($fields) && count($fields) > 0)
-          {
-            $tokens = array();
-            // loop through existing fields
-            foreach($fields as $field)
-            {
-              $tokens[$field['name']] = '{{'.$field['name'].'}}';
-              $args = array(
-                'image_sizes' => $image_sizes,
-                'file_styles' => $file_styles,
-                'field' => $field,
-                'weight' => $field['weight'],
-                'options' => $options,
-                'display' => $display,
-                'args'  => $args,
-                'tokens' => $tokens,
-              );
-              print theme('query_field', $args);
-            }
-          }
-          else
-          { ?>
-            <div class="qw-empty-list ui-state-highlight ui-corner-all">
-              No fields yet.  Click 'Add Fields' at the top to begin.
-            </div>
-            <?php
-          }
-        ?>
-      </div>
-      <!-- /edit fields -->
-
-    </div>
-
-<!-- sorts -->
-    <div id="tabs-sorts" class="qw-query-admin-tabs">
-
-      <div class="qw-query-add-titles qw-setting">
-        <span class="qw-query-title button" title="qw-display-add-sorts">
-          Add Sort Options
-        </span>
-      </div>
-      <p class="description">Click to change settings.  Drag and drop the sort options to change their order.</p>
-
-      <!-- edit sorts -->
-      <div id="existing-sorts" class="qw-sortable-list">
-        <?php
-          if(is_array($sorts) && count($sorts) > 0)
-          {
-            // loop through existing sorts
-            foreach($sorts as $sort_name => $sort)
-            {
-              $args = array(
-                'sort' => $sort,
-                'weight' => $sort['weight'],
-              );
-              print theme('query_sort', $args);
-            }
-          }
-        ?>
-        <div class="qw-empty-list ui-state-highlight ui-corner-all">
-          No sort options yet.  Click 'Add Sort Options' at the top to change the order of the results.
-        </div>
-      </div>
-      <!-- /edit sorts -->
-    </div>
-
-<!-- filters -->
-    <div id="tabs-filters" class="qw-query-admin-tabs">
-
-      <div class="qw-query-add-titles qw-setting">
-        <span class="qw-query-title button" title="qw-display-add-filters">
-          Add Filters
-        </span>
-      </div>
-      <p class="description">Click to change settings.  Drag and drop the filters to change their order.</p>
-      <!-- edit Filters -->
-      <div id="existing-filters" class="qw-sortable-list">
-        <?php
-          if(is_array($filters) && count($filters) > 0)
-          {
-            // loop through existing filters
-            foreach($filters as $filter_name => $filter)
-            {
-              $args = array(
-                'filter' => $filter,
-                'weight' => $filter['weight'],
-              );
-              print theme('query_filter', $args);
-            }
-          }
-        ?>
-        <div class="qw-empty-list ui-state-highlight ui-corner-all">
-          No filters yet.  Click 'Add Filters' at the top to begin filtering.
-        </div>
-      </div>
-      <!-- /edit filters -->
-    </div>
-  </div>
-
+  foreach ($handler_types as $type){
+    $handler = $handlers[$type];
+    print theme('editor_tabs_handler', array('handler' => $handler));
+  }
+?>
 
 <!-- Add Handlers -->
         <!-- add sorts -->

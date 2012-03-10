@@ -29,10 +29,11 @@ function qw_filter_tags_args(&$args, $filter){
  * Filter form
  */
 function qw_filter_tags_form($filter)
-{ ?>
+{
+  $tags = get_tags(array('hide_empty' => false));
+  ?>
   <div class="qw-checkboxes">
     <?php
-      $tags = get_tags(array('hide_empty' => false));
       foreach($tags as $tag)
       {
         $tag_checked = (isset($filter['values']['tags'][$tag->term_id])) ? 'checked="checked"' : '';

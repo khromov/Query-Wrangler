@@ -17,9 +17,9 @@
 #qw-list-title {
   width: 70%;
 }
-#qw-query-fields-list,
-#qw-query-filters-list,
-#qw-query-sorts-list {
+#qw-query-field-list,
+#qw-query-filter-list,
+#qw-query-sort-list {
   border-top: 1px solid #bbb;
   padding: 4px 0px;
 }
@@ -36,16 +36,16 @@ div.qw-query-title {
   padding: 2px 8px;
 }
 div.qw-query-title span.qw-setting-value,
-#qw-query-filters-list span.qw-setting-title,
-#qw-query-fields-list span.qw-setting-title,
-#qw-query-sorts-list span.qw-setting-title {
+#qw-query-filter-list span.qw-setting-title,
+#qw-query-field-list span.qw-setting-title,
+#qw-query-sort-list span.qw-setting-title {
   color: blue;
   text-decoration: underline;
   cursor: pointer;
 }
-#qw-query-filters-list span.qw-setting-value,
-#qw-query-fields-list span.qw-setting-value,
-#qw-query-sorts-list span.qw-setting-value {
+#qw-query-filter-list span.qw-setting-value,
+#qw-query-field-list span.qw-setting-value,
+#qw-query-sort-list span.qw-setting-value {
   color: black;
   text-decoration: none;
   font-weight: normal;

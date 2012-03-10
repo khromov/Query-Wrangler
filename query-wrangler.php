@@ -65,6 +65,7 @@ function qw_init_frontend(){
   include_once QW_PLUGIN_DIR.'/includes/query.inc';
   include_once QW_PLUGIN_DIR.'/includes/theme.inc';
   include_once QW_PLUGIN_DIR.'/includes/query-pages.inc';
+  include_once QW_PLUGIN_DIR.'/includes/handlers.inc';
 
   // basic settings
   include_once QW_PLUGIN_DIR.'/includes/basics/display_title.inc';
@@ -100,6 +101,12 @@ function qw_init_frontend(){
   include_once QW_PLUGIN_DIR.'/includes/filters/tags.inc';
   include_once QW_PLUGIN_DIR.'/includes/filters/taxonomies.inc';
 
+  // contextual_filters
+  include_once QW_PLUGIN_DIR.'/includes/contextual_filters/contexts.inc';
+  include_once QW_PLUGIN_DIR.'/includes/contextual_filters/categories.inc';
+  include_once QW_PLUGIN_DIR.'/includes/contextual_filters/tags.inc';
+  include_once QW_PLUGIN_DIR.'/includes/contextual_filters/taxonomies.inc';
+
   // sort options
   include_once QW_PLUGIN_DIR.'/includes/sorts/sorts.inc';
 }
@@ -110,12 +117,12 @@ $_SESSION['qw']['time']['load']['start'] = microtime(1);
   // admin only
   if(is_admin())
   {
-    include_once QW_PLUGIN_DIR.'/admin/theme.inc';
-    include_once QW_PLUGIN_DIR.'/admin/query.inc';
-    include_once QW_PLUGIN_DIR.'/admin/pages.inc';
-    include_once QW_PLUGIN_DIR.'/admin/ajax.inc';
-    include_once QW_PLUGIN_DIR.'/admin/editors.inc';
-    include_once QW_PLUGIN_DIR.'/admin/wizards.inc';
+    include_once QW_PLUGIN_DIR.'/admin/admin-theme.inc';
+    include_once QW_PLUGIN_DIR.'/admin/admin-query.inc';
+    include_once QW_PLUGIN_DIR.'/admin/admin-pages.inc';
+    include_once QW_PLUGIN_DIR.'/admin/admin-ajax.inc';
+    include_once QW_PLUGIN_DIR.'/admin/admin-editors.inc';
+    include_once QW_PLUGIN_DIR.'/admin/admin-wizards.inc';
 
     add_action( 'wp_ajax_nopriv_qw_form_ajax', 'qw_form_ajax' );
     add_action( 'wp_ajax_qw_form_ajax', 'qw_form_ajax' );
@@ -127,7 +134,7 @@ $_SESSION['qw']['time']['load']['start'] = microtime(1);
       if(!empty($_GET['edit']) &&
          empty($_GET['export']))
       {
-        qw_init_edit_theme();
+        qw_editors_init();
         add_action( 'admin_enqueue_scripts', 'qw_admin_js' );
       }
 
@@ -210,7 +217,9 @@ function qw_query_wrangler_table(){
 }
 register_activation_hook(__FILE__,'qw_query_wrangler_table');
 
-// override terms table
+/*
+ * DEPRECATED: override terms table
+ */
 function qw_query_override_terms_table(){
   global $wpdb;
   $table_name = $wpdb->prefix."query_override_terms";
@@ -223,6 +232,24 @@ function qw_query_override_terms_table(){
   dbDelta($sql);
 }
 register_activation_hook(__FILE__,'qw_query_override_terms_table');
+
+/*
+ * Override terms table
+ */
+function qw_query_overrides_table(){
+  global $wpdb;
+  $table_name = $wpdb->prefix."query_overrides";
+  $sql = "CREATE TABLE " . $table_name . " (
+	  query_id mediumint(9) NOT NULL,
+   override_hook varchar(24) NOT NULL,
+   override_id varchar(24) NOT NULL,
+  KEY `query_id` (`query_id`)
+	);";
+
+  require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+  dbDelta($sql);
+}
+register_activation_hook(__FILE__,'qw_query_overrides_table');
 
 /*
  * See the output time for a query
