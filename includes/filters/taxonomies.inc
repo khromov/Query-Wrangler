@@ -161,7 +161,11 @@ function qw_filter_taxonomies_exposed_form_terms_checkbox($filter, $terms)
       // List all categories as checkboxes
       foreach($terms as $term)
       {
-        $term_checked = (in_array($term->term_id, $filter['values']['terms'])) ? 'checked="checked"' : '';
+        if (is_array($filter['values']['terms']) && in_array($term->term_id, $filter['values']['terms'])) {
+          $term_checked = 'checked="checked"';
+        } else {
+          $term_checked = '';
+        }
         ?>
         <label class="query-checkbox">
           <input type="checkbox"

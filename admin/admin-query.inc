@@ -40,7 +40,6 @@ function qw_insert_new_query($post){
  */
 function qw_update_query($post){
   global $wpdb;
-  $table_name = $wpdb->prefix."query_wrangler";
   $options = $post['qw-query-options'];
   $handlers = qw_preprocess_handlers($options);
 
@@ -77,10 +76,6 @@ function qw_update_query($post){
 
   // hook for presave
   do_action_ref_array('qw_pre_save', array(&$options));
-
-  $query_id = $post['query-id'];
-  $new_data = qw_serialize($options);
-
   $type = 'default';
   if (is_array($options['display']['types'])){
     $type = implode(',',$options['display']['types']);
@@ -97,16 +92,19 @@ function qw_update_query($post){
       $page_path = ltrim($page_path, '/');
     }
   }
+
+  $query_id = $post['query-id'];
+
+  $table_name = $wpdb->prefix."query_wrangler";
   $data = array(
     'type' => $type,
     'path' => $page_path,
-    'data' => $new_data,
+    'data' => qw_serialize($options),
   );
   $where = array(
     'id' => $query_id,
   );
   $wpdb->update($table_name, $data, $where);
-
 
   // additional override work
   // allow contextual filters change to save values to the db
@@ -233,9 +231,6 @@ function qw_textarea($value){
  */
 function qw_check_version()
 {
-  //include_once QW_PLUGIN_DIR.'/upgrade.php';
-  //qw_upgrade_15_to_16();
-
   if ($last_version = get_option('qw_plugin_version')) {
     // compare versions
     if ($last_version < QW_VERSION){

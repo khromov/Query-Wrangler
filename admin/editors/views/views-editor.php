@@ -54,40 +54,34 @@
         ?>
       </div> <!-- /qw-query-args -->
 
-      <?php
-        // use pager on pages and overrides
-        if($query_type == 'page' || $query_type == 'override')
-        { ?>
-          <div class="qw-clear-gone"><!-- ie hack -->&nbsp;</div>
-          <div id="qw-page-settings" class="qw-query-admin-options">
-            <h4>Page Settings</h4>
-            <?php
-              foreach($basics as $basic)
-              {
-                // make sure item has form
-                if (isset($basic['form']) &&
-                    // page settings only
-                    $basic['type'] == 'page')
-                { ?>
-                    <div class="qw-query-title" title="qw-<?php print $basic['hook_key']; ?>">
-                      <?php print $basic['title']; ?>
-                      :
-                      <span class="qw-setting-value">
-                        <?php
-                          if ($options[$basic['type']][$basic['hook_key']]){
-                            print $options[$basic['type']][$basic['hook_key']];
-                          }
-                        ?>
-                      </span>
-                    </div>
-                  <?php
-                }
-              }
-            ?>
-          </div>
-          <?php
-        }
-      ?>
+    <!-- Page Settings -->
+      <div class="qw-clear-gone"><!-- ie hack -->&nbsp;</div>
+      <div id="qw-page-settings" class="qw-query-admin-options">
+        <h4>Page Settings</h4>
+        <?php
+          foreach($basics as $basic)
+          {
+            // make sure item has form
+            if (isset($basic['form']) &&
+                // page settings only
+                $basic['type'] == 'page')
+            { ?>
+                <div class="qw-query-title" title="qw-<?php print $basic['hook_key']; ?>">
+                  <?php print $basic['title']; ?>
+                  :
+                  <span class="qw-setting-value">
+                    <?php
+                      if ($options[$basic['type']][$basic['hook_key']]){
+                        print $options[$basic['type']][$basic['hook_key']];
+                      }
+                    ?>
+                  </span>
+                </div>
+              <?php
+            }
+          }
+        ?>
+      </div>
     </div>
     <!-- /column -->
 

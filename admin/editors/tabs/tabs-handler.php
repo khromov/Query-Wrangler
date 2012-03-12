@@ -8,7 +8,7 @@
     <p class="description">Click to change settings.  Drag and drop the fields to change their order.</p>
 
     <!-- edit fields -->
-    <div id="existing-<?php print $handler['hook_key']; ?>" class="qw-sortable-list">
+    <div id="existing-<?php print $handler['hook_key']; ?>s" class="qw-sortable-list">
       <?php
         if(is_array($handler['items']))
         {
@@ -23,7 +23,7 @@
             // special case for fields
             if ($handler['hook_key'] == 'field'){
               $tokens[$item['name']] = '{{'.$item['name'].'}}';
-              $args['tokens'] => $tokens;
+              $args['tokens'] = $tokens;
             }
 
             print theme('query_'.$handler['hook_key'], $args);

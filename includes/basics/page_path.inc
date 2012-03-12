@@ -9,7 +9,7 @@ function qw_basic_settings_page_path($basics){
   $basics['page_path'] = array(
     'title' => 'Page Path',
     'type' => 'page',
-    'description' => 'The path or permalink you want this page to use. Avoid using spaces and capitalization for best results.',
+    'description' => 'The path or permalink you want this page to use. Avoid using spaces and capitalization for best results.<br />This only works if the Display Type "Page" is selected.',
     'form_callback' => 'qw_basic_settings_page_path_form',
     'weight' => 0,
   );

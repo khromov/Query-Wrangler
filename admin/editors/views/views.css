@@ -18,6 +18,7 @@
   width: 70%;
 }
 #qw-query-field-list,
+#qw-query-contextual_filter-list,
 #qw-query-filter-list,
 #qw-query-sort-list {
   border-top: 1px solid #bbb;
@@ -37,6 +38,7 @@ div.qw-query-title {
 }
 div.qw-query-title span.qw-setting-value,
 #qw-query-filter-list span.qw-setting-title,
+#qw-query-contextual_filter-list span.qw-setting-title,
 #qw-query-field-list span.qw-setting-title,
 #qw-query-sort-list span.qw-setting-title {
   color: blue;
@@ -44,6 +46,7 @@ div.qw-query-title span.qw-setting-value,
   cursor: pointer;
 }
 #qw-query-filter-list span.qw-setting-value,
+#qw-query-contextual_filter-list span.qw-setting-value,
 #qw-query-field-list span.qw-setting-value,
 #qw-query-sort-list span.qw-setting-value {
   color: black;

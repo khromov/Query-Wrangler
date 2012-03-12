@@ -4,7 +4,7 @@
  */
 
 // add default editors to hook
-add_filter('qw_editors', 'qw_editors_tabs', 0);
+add_filter('qw_editors', 'qw_editors_tabs');
 // tw hook
 add_filter('tw_templates', 'qw_editors_tabs_templates');
 
@@ -38,6 +38,13 @@ function qw_editors_tabs_templates($templates){
       'handler' => array(),
     ),
   );
+  $templates['editor_tabs_add_handler'] = array(
+    'files' => 'admin/editors/tabs/tabs-add-handler.php',
+    'default_path' => QW_PLUGIN_DIR,
+    'arguments' => array(
+      'handler' => array(),
+    ),
+  );
 
   return $templates;
 }
@@ -56,7 +63,7 @@ function qw_editors_tabs_css(){
 // js
 function qw_editors_tabs_js(){
   wp_enqueue_script('qw-admin-theme-tabs',
-                  plugins_url('/admin/editors/tabs/tabs.js', dirname(__FILE__)),
+                  plugins_url('/tabs/tabs.js', dirname(__FILE__)),
                   array('jquery-ui-core',
                         'jquery-ui-sortable',
                         'jquery-ui-tabs',

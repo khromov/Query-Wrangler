@@ -72,7 +72,7 @@ function qw_generate_query_options($query_id, $options_override = array(), $full
 
   // unserealize the stored data
   $options = qw_unserialize($rows[0]->data);
-
+  
   // override options
   if ($full_override) {
     // force a full override

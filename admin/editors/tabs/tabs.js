@@ -77,7 +77,7 @@ QueryWrangler.get_handler_templates = function(handler, handler_hook, item_type)
  */
 QueryWrangler.add_item = function(){
   var handler = jQuery(this).children('input.add-handler-type').val();
-  jQuery('#qw-display-add-'+handler+'s input[type=checkbox]')
+  jQuery('#qw-display-add-'+handler+' input[type=checkbox]')
     .each(function(index,element){
       if(jQuery(element).is(':checked')){
         // item type

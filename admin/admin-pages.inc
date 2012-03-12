@@ -154,7 +154,7 @@ function qw_edit_query_form(){
   $row = $wpdb->get_row($sql);
 
   $options = qw_unserialize($row->data);
-  
+
   // handlers
   $handlers = qw_preprocess_handlers($options);
 
@@ -237,6 +237,7 @@ function qw_save_settings($post){
 }
 function qw_settings_page()
 {
+  qw_editors_init();
   $settings_args = array(
     'theme' => get_option('qw_edit_theme'),
     'edit_themes' => qw_all_editors(),

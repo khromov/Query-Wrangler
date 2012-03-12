@@ -1,6 +1,6 @@
 <?php
 /*
- * $filter: array of default filter data, and specific filter data
+ * $filter: array of default filter data, and specific filter['values']
  */
 ?>
 <!-- <?php print $filter['name']; ?> -->

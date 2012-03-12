@@ -18,9 +18,10 @@ function qw_templates($templates){
   // display queries style wrapper
   $templates['query_display_wrapper'] = array(
     'files' => array(
+      'templates/query-wrapper-[slug].php',
+      'templates/query-wrapper.php',
       'query-wrapper-[slug].php',
       'query-wrapper.php',
-      'templates/query-wrapper.php',
     ),
     'default_path' => QW_PLUGIN_DIR,
     'arguments' => array(
@@ -30,9 +31,10 @@ function qw_templates($templates){
   // full and field styles
   $templates['query_display_rows'] = array(
     'files' => array(
+      'templates/[template]-[slug].php',
+      'templates/[template].php',
       '[template]-[slug].php',
       '[template].php',
-      'templates/[template].php',
     ),
     'default_path' => QW_PLUGIN_DIR,
     'arguments' => array(
@@ -50,17 +52,14 @@ function qw_templates($templates){
  */
 function theme_query_display_rows_preprocess($template)
 {
+  $all_styles = qw_all_styles();
   // make sure we know what style to use
-  if(isset($template['arguments']['style']))
+  if(isset($all_styles[$template['arguments']['style']]))
   {
     // get the specific style
-    $all_styles = qw_all_styles();
-
+    $style = $all_styles[$template['arguments']['style']];
     // set this template's default path to the style's default path
-    if(isset($all_styles[$template['arguments']['style']])){
-      $style = $all_styles[$template['arguments']['style']];
-      $template['default_path'] = $style['default_path'];
-    }
+    $template['default_path'] = $style['default_path'];
   }
   return $template;
 }
@@ -91,15 +90,14 @@ function qw_template_query(&$wp_query, $options)
 
     $style = $all_styles[$options['display']['style']];
 
-     // setup row template arguments
-     $template_args = array(
-       'template' => 'query-'.$style['hook_key'],
-       'slug' => $options['meta']['slug'],
-       'style' => $style['hook_key'],
-       'style_settings' => $options['display']['style_settings'][$style['hook_key']],
-       'options' => $options,
-      );
-
+    // setup row template arguments
+    $template_args = array(
+      'template' => $style['template'],
+      'slug' => $options['meta']['slug'],
+      'style' => $style['hook_key'],
+      'style_settings' => $options['display']['style_settings'][$style['hook_key']],
+      'options' => $options,
+    );
     // the content of the widget is the result of the query
     if($options['display']['row_style'] == "posts") {
       $template_args['rows'] = qw_make_posts_rows($wp_query, $options);
@@ -158,14 +156,16 @@ function qw_template_query(&$wp_query, $options)
  */
 function qw_make_posts_rows(&$wp_query, $options){
   $rows = array();
+  $row_style_settings = $options['display']['row_style_settings'][$options['display']['row_style']];
+
   $i = 0;
   while($wp_query->have_posts())
   {
     $wp_query->the_post();
     $template_args = array(
-      'template' => 'query-'.$options['display']['post_settings']['size'],
+      'template' => 'query-'.$row_style_settings['size'],
       'slug' => $options['meta']['slug'],
-      'style' => $options['display']['post_settings']['size'],
+      'style' => $row_style_settings['size'],
     );
     $rows[$i]['row_classes'] = qw_row_classes($i);
     $field_classes = array('query-post-wrapper');
@@ -211,45 +211,44 @@ function qw_make_fields_rows(&$wp_query, $options)
     // make row classes
     $rows[$i]['row_classes'] = qw_row_classes($i);
 
-    if(is_array($display['field_settings']['fields']))
+    if(is_array($display['fields']))
     {
       // sort according to weights
-      uasort($display['field_settings']['fields'],'qw_cmp');
+      uasort($display['fields'],'qw_cmp');
 
       // loop through each field
-      foreach($display['field_settings']['fields'] as $field_name => $field_settings)
+      foreach($display['fields'] as $field_name => $field_values)
       {
+        // get field details from all fields list
+        $field = $all_fields[$field_values['hook_key']];
+        // merge default data with values
+        $field['values'] = $field_values;
+
         // field open
         $field_classes = array('query-field');
-        $field_classes[] = 'query-field-'.$field_settings['name'];
+        $field_classes[] = 'query-field-'.$field_name;
 
         $rows[$i]['fields'][$field_name]['classes'] = implode(" ",$field_classes);
 
-        // get field details from all fields list
-        $field_defaults = $all_fields[$field_settings['type']];
-
-        // merge default data with values
-        $field = array_merge($field_defaults, $field_settings);
-
         // look for callback
-        if(isset($field_defaults['output_callback']))
+        if(isset($field['output_callback']))
         {
           // callbacks with token arguments
-          if ($field_defaults['output_arguments']){
-            $rows[$i]['fields'][$field_name]['output'].= $field_defaults['output_callback']($this_post, $field);
+          if ($field['output_arguments']){
+            $rows[$i]['fields'][$field_name]['output'].= $field['output_callback']($this_post, $field);
           }
           // normal callback w/o arguments
           else {
-            $rows[$i]['fields'][$field_name]['output'].= $field_defaults['output_callback']();
+            $rows[$i]['fields'][$field_name]['output'].= $field['output_callback']();
           }
         }
         // use field itself
         else {
-          $rows[$i]['fields'][$field_name]['output'].= $this_post->{$field_settings['type']};
+          $rows[$i]['fields'][$field_name]['output'].= $this_post->{$field['values']['type']};
         }
 
         // apply link to field
-        if(isset($field_settings['link'])){
+        if(isset($field['values']['link'])){
           $rows[$i]['fields'][$field_name]['output'] = '<a class="query-field-link" href="'.get_permalink().'">'.$rows[$i]['fields'][$field_name]['output'].'</a>';
         }
 
@@ -257,28 +256,28 @@ function qw_make_fields_rows(&$wp_query, $options)
         $tokens['{{'.$field_name.'}}'] = $rows[$i]['fields'][$field_name]['output'];
 
         // look for rewrite output
-        if(isset($field_settings['rewrite_output'])){
+        if(isset($field['values']['rewrite_output'])){
           // replace tokens with results
-          $field_settings['custom_output'] = str_replace(array_keys($tokens), array_values($tokens), $field_settings['custom_output']);
-          $rows[$i]['fields'][$field_name]['output'] = $field_settings['custom_output'];
+          $field['values']['custom_output'] = str_replace(array_keys($tokens), array_values($tokens), $field['values']['custom_output']);
+          $rows[$i]['fields'][$field_name]['output'] = $field['values']['custom_output'];
         }
 
         // get default field label for tables
-        $rows[$i]['fields'][$field_name]['label'] = ($field_settings['has_label']) ? $field_settings['label'] : '';
+        $rows[$i]['fields'][$field_name]['label'] = ($field['values']['has_label']) ? $field['values']['label'] : '';
 
         // apply labels to full style fields
-        if(isset($field_settings['has_label']) &&
+        if(isset($field['values']['has_label']) &&
            $display['type'] != 'full' &&
-           $display['field_settings']['style'] != 'table')
+           $display['style'] != 'table')
         {
-          $rows[$i]['fields'][$field_name]['output'] = '<label class="query-label">'.$field_settings['label'].'</label> '.$rows[$i]['fields'][$field_name]['output'];
+          $rows[$i]['fields'][$field_name]['output'] = '<label class="query-label">'.$field['values']['label'].'</label> '.$rows[$i]['fields'][$field_name]['output'];
         }
 
         // apply shortcodes to field output
         $rows[$i]['fields'][$field_name]['output'] = do_shortcode($rows[$i]['fields'][$field_name]['output']);
 
         // after all operations, remove if excluded
-        if($field_settings['exclude_display']){
+        if($field['values']['exclude_display']){
           unset($rows[$i]['fields'][$field_name]['output']);
         }
       }

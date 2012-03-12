@@ -11,7 +11,7 @@ function qw_handlers_default($handlers){
     'description' => 'Select Fields to add to this query output.',
     'data_callback' => 'qw_handler_field_data',
     'all_callback'  => 'qw_all_fields',
-    'form_prefix'   => '[display][field_settings][fields]',
+    'form_prefix'   => '[display][fields]',
     'wrapper_template' => 'query_field',
   );
   $handlers['sort'] = array(
@@ -86,7 +86,7 @@ function qw_handlers_templates($templates){
  * Simple functions for getting handler data from the query options
  */
 function qw_handler_field_data($options) {
-  return $options['display']['field_settings']['fields'];
+  return $options['display']['fields'];
 }
 function qw_handler_sort_data($options){
   return $options['args']['sorts'];

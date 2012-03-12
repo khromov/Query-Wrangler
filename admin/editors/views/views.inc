@@ -4,7 +4,7 @@
  */
 
 // add default editors to hook
-add_filter('qw_editors', 'qw_editors_views', 0);
+add_filter('qw_editors', 'qw_editors_views');
 // tw hook
 add_filter('tw_templates', 'qw_editors_views_templates');
 
