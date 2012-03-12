@@ -10,9 +10,10 @@
 function qw_execute_query($query_id, $options_override = array(), $reset_post_data = true)
 {
 $_SESSION['qw']['time']['execute']['start'] = microtime(1);
+
   global $wp_query;
   // backup the old query
-  $old_query = $wp_query;
+  $original_query = $wp_query;
 
   // get the query options
   $options = qw_generate_query_options($query_id, $options_override);
@@ -26,20 +27,24 @@ $_SESSION['qw']['time']['execute']['start'] = microtime(1);
   // set the new query
   $wp_query = new WP_Query($args);
 
+  // retain our global query throughout
+  $wp_query->original_wp_query = $original_query;
+
 // pre_render hook
   do_action_ref_array('qw_pre_render', array(&$options));
 
 $_SESSION['qw']['time']['execute']['end'] = microtime(1);
-
 $_SESSION['qw']['time']['template']['start'] = microtime(1);
+
   // get the themed content
   $themed = qw_template_query($wp_query, $options);
+
 $_SESSION['qw']['time']['template']['end'] = microtime(1);
 
   // Reset Post Data
   if($reset_post_data){
     wp_reset_postdata();
-    $wp_query = $old_query;
+    $wp_query = $original_query;
   }
 
   return $themed;
@@ -150,115 +155,7 @@ function qw_generate_query_args($options = array(), $options_override = array())
   }
   return $args;
 }
-function qw_exposed_submitted_data(){
-  $data = array();
-  if (!empty($_GET)){
-    $data = $_GET;
-  }
-  else if (!empty($_POST)){
-    $data = $_POST;
-  }
 
-  foreach($data as $k => $v){
-    if (empty($data[$k])){
-      unset($data[$k]);
-      unset($_GET[$k]);
-      unset($_POST[$k]);
-    }
-    else {
-      $data[$k] = urldecode($v);
-    }
-  }
-
-  if (count($data) > 0){
-    return $data;
-  }
-  return false;
-}
-/*
- * Organize an existing filters and give it all the data they needs
- *
- * @param $type
- *   handler-type = 'filter', 'field', 'sort'
- */
-function qw_preprocess_handlers($options){
-  // build handlers data
-  $handlers = qw_all_handlers();
-  // Retrieve the handler items from the query array
-  foreach ($handlers as $k => $handler){
-    if (function_exists($handler['data_callback'])){
-      $handlers[$k]['items'] = $handler['data_callback']($options);
-    }
-  }
-
-  foreach($handlers as $type => $handler){
-    // load all our default handlers
-    if (is_array($handler['items']))
-    {
-      $all = $handler['all_items'];
-
-      // generate the form name prefixes
-      foreach($handler['items'] as $name => $values)
-      {
-        // load sort type data
-        $hook_key = qw_get_hook_key($all, $values);
-
-        $this_item = $all[$hook_key];
-
-        // move type, hook_key, and weight to top level of array
-        $this_item['type'] = $values['type']; unset($values['type']);
-        $this_item['weight'] = $values['weight']; unset($values['weight']);
-        $this_item['hook_key'] = $values['hook_key']; unset($values['hook_key']);
-
-        // values are own array
-        $this_item['values'] = $values;
-        $this_item['name'] = $name;
-        $this_item['form_prefix'] = $handler['form_prefix'].'['.$name.']';
-
-        qw_handler_make_form($this_item);
-
-        // set new item
-        $handlers[$type]['items'][$name] = $this_item;
-      }
-    }
-  }
-
-  // sort sorts according to weight
-  if(is_array($handler['items'])){
-    uasort($handler['items'], 'qw_cmp');
-  }
-
-  return $handlers;
-}
-
-/*
- * Look for handler forms and settings forms and execute the callbacks
- */
-function qw_handler_make_form(&$handler){
-  // this handler's form
-  if (function_exists($handler['form_callback'])){
-    ob_start();
-      $handler['form_callback']($handler);
-    $handler['form'] = ob_get_clean();
-  }
-  // provide template wrangler support
-  else if (isset($handler['form_template'])){
-    $handler['form'] = theme($handler['form_template'], array('this' => $handler));
-  }
-
-  // see if item has an exposed settings form
-  if (function_exists($handler['exposed_settings_form_callback'])) {
-    ob_start();
-      $handler['exposed_settings_form_callback']($handler);
-    $handler['exposed_settings_form'] = ob_get_clean();
-  }
-  // provide template wrangler support
-  else if (isset($handler['exposed_settings_form_template'])){
-    $handler['exposed_settings_form'] = theme($handler['exposed_settings_form_template'], array('this' => $handler));
-  }
-//  krumo($handler['title'].' - '.$handler['hook_key']);
-//krumo($handler);
-}
 /*
  * Get all queries of the type widget
  *
@@ -268,7 +165,7 @@ function qw_get_all_widgets()
 {
   global $wpdb;
   $table_name = $wpdb->prefix."query_wrangler";
-  $sql = "SELECT id,name FROM ".$table_name." WHERE type = 'widget'";
+  $sql = "SELECT id,name FROM ".$table_name." WHERE type LIKE '%widget%'";
   $rows = $wpdb->get_results($sql);
 
   if(is_array($rows))
@@ -278,35 +175,6 @@ function qw_get_all_widgets()
       $widgets[$row->id] = $row->name;
     }
     return $widgets;
-  }
-}
-/*
- * Get all query pages
- *
- * @return array Query pages in WP post format
- */
-function qw_get_all_pages()
-{
-  global $wpdb;
-  $table_name = $wpdb->prefix."query_wrangler";
-  $sql = "SELECT id,name,path FROM ".$table_name." WHERE type = 'page'";
-  $rows = $wpdb->get_results($sql);
-
-  if(is_array($rows)){
-    $pages = array();
-    $blog_url = get_bloginfo('wpurl');
-
-    $i=0;
-    foreach($rows as $row){
-      $pages[$i] = new stdClass();
-      $pages[$i]->ID = $row->id;
-      $pages[$i]->title = $row-name;
-      $pages[$i]->post_title = $row->name;
-      $pages[$i]->guid = $blog_url.$row->path;
-      $pages[$i]->post_type = 'page';
-    }
-
-    return $pages;
   }
 }
 

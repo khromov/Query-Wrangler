@@ -34,19 +34,42 @@
 
     <div class="qw-setting">
       <label class="qw-label">Default context:</label>
-      <select name='<?php print $contextual_filter['form_prefix']; ?>[context]'>
-        <option>None</option>
+      <div class="qw-checkboxes clear-left">
         <?php
+          // set a default
+          if (!isset($contextual_filter['values']['context'])){
+            $contextual_filter['values']['context'] = 'none';
+          }
           $contexts = qw_all_contexts();
           foreach($contexts as $value => $context) {
-            $selected = ($contextual_filter['values']['context'] == $value) ? 'selected="selected"' : '';
+            $selected = ($contextual_filter['values']['context'] == $value) ? 'checked="checked"' : '';
             ?>
-              <option value="<?php print $value; ?>" <?php print $selected; ?> ><?php print $context['title']; ?></option>
+              <label class="qw-query-checkbox">
+                <input type="radio"
+                       name="<?php print $contextual_filter['form_prefix']; ?>[context]"
+                       value="<?php print $value; ?>"
+                       <?php print $selected; ?> />
+                <?php print $context['title']; ?>
+              </label>
+              <p class="description qw-desc"><?php print $context['description']; ?></p>
             <?php
           }
         ?>
-      </select>
+      </div>
     </div>
+
+
+    <?php
+      if ($contextual_filter['form'])
+      { ?>
+        <div class="qw-setting">
+          <div class="qw-contextual_filter-form">
+            <?php print $contextual_filter['form']; ?>
+          </div>
+        </div>
+        <?php
+      }
+    ?>
 
     <div>
       <?php
@@ -66,10 +89,10 @@
       ?>
 
       <?php
-        if ($contextual_filter['form'])
+        if ($contextual_filter['override_form'])
         { ?>
-          <div class="qw-contextual_filter-form">
-            <?php print $contextual_filter['form']; ?>
+          <div class="qw-contextual_filter-override_form">
+            <?php print $contextual_filter['override_form']; ?>
           </div>
           <?php
         }

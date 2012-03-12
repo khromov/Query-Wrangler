@@ -11,7 +11,6 @@ function qw_basic_settings_page_path($basics){
     'type' => 'page',
     'description' => 'The path or permalink you want this page to use. Avoid using spaces and capitalization for best results.',
     'form_callback' => 'qw_basic_settings_page_path_form',
-    'allowed_query_types' => array('page'),
     'weight' => 0,
   );
   return $basics;
@@ -20,12 +19,15 @@ function qw_basic_settings_page_path($basics){
 
 function qw_basic_settings_page_path_form($basic, $options)
 {
+  $page_enabled = ($options['display']['types']['page']) ? 'checked="checked"' : '';
   $path = $options['display']['page']['path'];
   ?>
-  <input size="60"
-       type="text"
-       name="<?php print $basic['form_prefix']; ?>[path]"
-       value="<?php print $path; ?>" />
-  <p class="description"><?php print $basic['description']; ?></p>
+  <div>
+    <input size="60"
+         type="text"
+         name="<?php print $basic['form_prefix']; ?>[path]"
+         value="<?php print $path; ?>" />
+    <p class="description"><?php print $basic['description']; ?></p>
+  </div>
   <?php
 }

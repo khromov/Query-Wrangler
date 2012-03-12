@@ -29,7 +29,18 @@ function qw_upgrade_15_to_16()
 
   // loop through queries
   foreach($rows as $query){
+    $has_widget = NULL;
     $data = qw_unserialize($query->data);
+
+    // start a basic storage mechanism for display types
+    if ($query->type == "widget"){
+      $has_widget = 1;
+      $data['display']['types']['widget'] = 'widget';
+    }
+
+    if ($query->type == "page" && $query->path != ""){
+      $data['display']['types']['page'] = 'page';
+    }
 
     // new data targets
     $data['display']['style_settings'] = array();
@@ -54,13 +65,109 @@ function qw_upgrade_15_to_16()
       unset($data['display']['field_settings']);
     }
 
-    // [display][override] = [args][contextual_filters]
-      // ['do_override'] = 'on';
+    // convert category and tags filters to taxonomy filters
+    if(is_array($data['args']['filters'])){
+      foreach($data['args']['filters'] as $name => $filter){
+        // convert category to taxonomy filter
+        if ($filter['hook_key'] == 'categories'){
+          $new_filter = array(
+            'type' => 'taxonomy_category',
+            'hook_key' => 'taxonomy_category',
+            'terms' => $filter['cats'],
+            'name' => $name,
+            'weight' => $filter['weight'],
+          );
 
-    // move all override values to the new override table
+          // update operator
+          switch ($filter['cat_operator']){
+            case 'cat':
+              $new_filter['operator'] = 'IN';
+              break;
+            case 'category__in':
+              $new_filter['operator'] = 'IN';
+              $new_filter['include_children'] = 'on';
+              break;
+            case 'category__and':
+              $new_filter['operator'] = 'AND';
+              break;
+            case 'category__not_in':
+              $new_filter['operator'] = 'NOT IN';
+              break;
+          }
 
-    // save query
+          $data['args']['filters'][$name] = $new_filter;
+        }
+
+        // convert tags to taxonomy filter
+        if ($filter['hook_key'] == 'tags'){
+          $new_filter = array(
+            'type' => 'taxonomy_post_tag',
+            'hook_key' => 'taxonomy_post_tag',
+            'terms' => $filter['tags'],
+            'name' => $name,
+            'weight' => $filter['weight'],
+          );
+
+          // update operator
+          switch ($filter['tag_operator']){
+            case 'tag__in':
+              $new_filter['operator'] = 'IN';
+              break;
+            case 'tag__and':
+              $new_filter['operator'] = 'AND';
+              break;
+            case 'tag__not_in':
+              $new_filter['operator'] = 'NOT IN';
+              break;
+          }
+
+          $data['args']['filters'][$name] = $new_filter;
+        }
+      }
+    }
+
+    // OVERRIDES = CONTEXT FILTER
+    if ($query->type == 'override'){
+      if (is_array($data['display']['override'])){
+        foreach($data['display']['override'] as $type => $values)
+        {
+          if($type == 'tags'){
+            $hook_key = 'taxonomy_post_tag';
+          } else if ($type == 'cats'){
+            $hook_key = 'taxonomy_category';
+          }
+
+          // [display][override] = [args][contextual_filters]
+          $new_filter = array(
+            'type' => $hook_key,
+            'hook_key' => $hook_key,
+            'name' => $hook_key,
+            'do_override' => 'on',
+            'context' => 'global_query',
+            'operator' => 'IN',
+            'terms' => $values,
+            'weight' => count($data['args']['contextual_filters']),
+          );
+
+          $data['args']['contextual_filters'][$new_filter['name']] = $new_filter;
+
+          // add all override values to the new override table
+          qw_contextual_filter_taxonomies_query_update($new_filter);
+        }
+        // remove the old override data
+        unset($data['display']['override']);
+      }
+    }
+
+    // build types into a string
+    $type = 'default';
+    if (is_array($data['display']['types'])){
+      $type = implode(',',$data['display']['types']);
+    }
+
+    // update data
     $update = array(
+      'type' => $type,
       'data' => qw_serialize($data),
     );
     $where = array(
@@ -70,6 +177,7 @@ function qw_upgrade_15_to_16()
   }
 
   // drop old override table
+  //$wpdb->query("DROP TABLE `".$wpdb->prefix."query_override_terms`");
 }
 /*
  * Upgrade from 1.4 to 1.5

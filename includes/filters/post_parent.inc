@@ -10,7 +10,6 @@ function qw_filter_post_parent($filters){
     'title' => 'Post Parent',
     'description' => 'Use only with post type "Page" to show results with the chosen parent ID.',
     'form_callback' => 'qw_filter_post_parent_form',
-    'allowed_query_types' => array('page','widget'),
     // exposed
     'exposed_form' => 'qw_filter_post_parent_exposed_form',
     'exposed_process' => 'qw_filter_post_parent_exposed_process',
@@ -43,10 +42,13 @@ function qw_filter_post_parent_exposed_process(&$args, $filter, $value){
  * Exposed form
  */
 function qw_filter_post_parent_exposed_form($filter)
-{ ?>
+{
+  $submitted = qw_exposed_submitted_data();
+  $values = ($subitted[$filter['exposed_key']]) ? $submitted[$filter['exposed_key']] : $filter['values']['post_parent'];
+  ?>
   <input type="text"
          name="<?php print $filter['exposed_key']; ?>"
-         value="<?php print $_GET[$filter['exposed_key']]; ?>" />
+         value="<?php print $values; ?>" />
   <?php
 }
 //function qw_filter_post_parent_exposed_settings_form($filter){}

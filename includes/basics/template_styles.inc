@@ -79,7 +79,7 @@ function qw_basic_settings_style_form($basic, $options)
         foreach($styles as $type => $style){
           if (function_exists($style['settings_callback']))
           {
-            $style['values'] = $options['display'][$style['settings_key']];
+            $style['values'] = $options['display']['style_settings'][$type];
             ?>
             <div id="tab-style-settings-<?php print $style['hook_key']; ?>" class="qw-query-content">
               <span class="qw-setting-header"><?php print $style['title']; ?> Settings</span>

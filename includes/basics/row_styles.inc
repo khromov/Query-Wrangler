@@ -90,7 +90,7 @@ function qw_basic_settings_row_style_form($basic, $options)
         foreach($row_styles as $type => $row_style){
           if (function_exists($row_style['settings_callback']))
           {
-            $row_style['values'] = $display[$row_style['settings_key']];
+            $row_style['values'] = $options['display']['row_style_settings'][$type];
             ?>
             <div id="tab-row-style-settings-<?php print $row_style['hook_key']; ?>" class="qw-query-content">
               <span class="qw-setting-header"><?php print $row_style['title']; ?> Settings</span>
@@ -108,17 +108,17 @@ function qw_basic_settings_row_style_form($basic, $options)
 /*
  * Post row style settings form
  */
-function qw_basic_settings_row_styles_posts_settings()
+function qw_basic_settings_row_styles_posts_settings($row_style)
 { ?>
     <p class="description">Select the amount of the post to be shown.</p>
     <select class="qw-title-ignore"
-            name="qw-query-options[display][post_settings][size]">
+            name="<?php print $row_style['form_prefix']; ?>[size]">
       <option value="complete"
-              <?php if($options['display']['post_settings']['size'] == "complete") { print 'selected="selected"';} ?>>
+              <?php if($row_style['values']['size'] == "complete") { print 'selected="selected"';} ?>>
         Complete Post
       </option>
       <option value="excerpt"
-              <?php if($options['display']['post_settings']['size'] == "excerpt") { print 'selected="selected"';} ?>>
+              <?php if($row_style['values']['size'] == "excerpt") { print 'selected="selected"';} ?>>
         Excerpt
       </option>
     </select>

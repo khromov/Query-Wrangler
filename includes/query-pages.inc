@@ -91,11 +91,11 @@ function qw_query_pages_handler()
   }
 
   global $wp_query,$wpdb;
-  $handled_ops = array('category', 'tag', 'tax', '404');
-  
+  $handled_ops = array('category', 'tag', 'tax', '404', 'single');
+
   // page op is based on WP tags like is_category() && is_404()
   $op = qw_get_page_op();
-
+  
   // we only handle sepcific types of pages and overrides
   if(in_array($op, $handled_ops))
   {
@@ -124,7 +124,7 @@ function qw_query_pages_handler()
       }
 
       // Look for the query path given
-      $sql = "SELECT id,name,path,data FROM ".$qw_table." WHERE type = 'page' AND path = '".$path."'";
+      $sql = "SELECT id,name,path,data FROM ".$qw_table." WHERE type LIKE '%page%' AND path = '".$path."'";
       $query = $wpdb->get_row($sql);
     }
 
@@ -134,18 +134,21 @@ function qw_query_pages_handler()
     // get query by contextual filter
     $handlers = qw_all_handlers();
     foreach ($handlers['contextual_filter']['all_items'] as $item){
-      if ($item['query_op'] == $op){
-        $override_id = $item['query_override_id_callback']($item);
-
-        // get potential query
-        $sql = "SELECT qw.id, qw.data
-                FROM ".$qw_table." as qw
-                LEFT JOIN ".$qo_table." as qo ON qo.query_id = qw.id
-                WHERE qo.override_id = '".$override_id."'
-                  AND qo.override_hook = '".$item['hook_key']."'
-                LIMIT 1";
-        if ($query = $wpdb->get_row($sql)){
-          break;
+      // make sure the handler item can handle overrides
+      if (isset($item['query_override_id_callback'])){
+        // make sure the override_id was found in wp_query
+        if ($override_id = $item['query_override_id_callback']($item))
+        {
+          // get potential query
+          $sql = "SELECT qw.id, qw.data
+                  FROM ".$qw_table." as qw
+                  LEFT JOIN ".$qo_table." as qo ON qo.query_id = qw.id
+                  WHERE qo.override_id = '".$override_id."'
+                    AND qo.override_hook = '".$item['hook_key']."'
+                  LIMIT 1";
+          if ($query = $wpdb->get_row($sql)){
+            break;
+          }
         }
       }
     }

@@ -16,7 +16,7 @@ add_filter('tw_templates', 'qw_admin_templates');
 function qw_admin_templates($templates){
   // preview query
   $templates['preview_wrapper'] = array(
-    'files' => 'admin/preview-json.php',
+    'files' => 'admin/preview-wrapper.php',
     'default_path' => QW_PLUGIN_DIR,
   );
   $templates['preview_ajax'] = array(

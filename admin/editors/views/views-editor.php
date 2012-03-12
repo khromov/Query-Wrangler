@@ -32,9 +32,8 @@
         <?php
           foreach($basics as $basic)
           {
-            // make sure item is allowed and has form
-            if (in_array($query_type, $basic['allowed_query_types']) &&
-                isset($basic['form']) &&
+            // make sure item has form
+            if (isset($basic['form']) &&
                 // not page settings
                 $basic['type'] != 'page')
             { ?>
@@ -65,9 +64,8 @@
             <?php
               foreach($basics as $basic)
               {
-                // make sure item is allowed and has form
-                if (in_array($query_type, $basic['allowed_query_types']) &&
-                    isset($basic['form']) &&
+                // make sure item has form
+                if (isset($basic['form']) &&
                     // page settings only
                     $basic['type'] == 'page')
                 { ?>

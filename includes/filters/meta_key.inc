@@ -44,10 +44,12 @@ function qw_filter_meta_key_exposed_process(&$args, $filter, $value){
  */
 function qw_filter_meta_key_exposed_form($filter)
 {
+  $submitted = qw_exposed_submitted_data();
+  $values = ($submitted[$filter['exposed_key']]) ? $submitted[$filter['exposed_key']] : $filter['values']['meta_key'];
   ?>
   <input type="text"
          name="<?php print $filter['exposed_key']; ?>"
-         value="<?php print $_GET[$filter['exposed_key']]; ?>" />
+         value="<?php print $values; ?>" />
   <?php
 }
 //function qw_filter_exposed_settings_form_meta_key($filter){}

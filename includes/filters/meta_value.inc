@@ -14,7 +14,6 @@ function qw_filter_meta_value($filters){
     // exposed
     'exposed_form' => 'qw_filter_meta_value_exposed_form',
     'exposed_process' => 'qw_filter_meta_value_exposed_process',
-    //'exposed_settings_form_callback' => 'qw_filter_meta_value_exposed_settings_form',
   );
   return $filters;
 }
@@ -49,10 +48,13 @@ function qw_filter_meta_value_exposed_process(&$args, $filter, $value){
  * Exposed form
  */
 function qw_filter_meta_value_exposed_form($filter)
-{ ?>
+{
+  $submitted = qw_exposed_submitted_data();
+  $values = ($submitted[$filter['exposed_key']]) ? $submitted[$filter['exposed_key']] : stripcslashes($filter['values']['meta_value']);
+  ?>
   <input type="text"
          name="<?php print $filter['exposed_key']; ?>"
-         value="<?php print $_GET[$filter['exposed_key']]; ?>" />
+         value="<?php print $values; ?>" />
   <?php
 }
 //function qw_filter_meta_value_exposed_settings_form($filter){}

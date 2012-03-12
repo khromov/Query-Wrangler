@@ -11,7 +11,6 @@ function qw_basic_settings_page_template($basics){
     'type' => 'page',
     'description' => 'Select which page template should wrap this query page.',
     'form_callback' => 'qw_basic_settings_page_template_form',
-    'allowed_query_types' => array('page', 'override'),
     'weight' => 0,
   );
   return $basics;

@@ -43,8 +43,7 @@
       <?php
         foreach($basics as $basic)
         {
-          if ($basic['type'] == 'args' &&
-              in_array($query_type, $basic['allowed_query_types']))
+          if ($basic['type'] == 'args')
           { ?>
             <div class="qw-setting">
               <label class="qw-label"><?php print $basic['title']; ?>:</label>
@@ -69,8 +68,7 @@
       <?php
         foreach($basics as $basic)
         {
-          if ($basic['type'] == 'display' &&
-              in_array($query_type, $basic['allowed_query_types']))
+          if ($basic['type'] == 'display')
           { ?>
             <div class="qw-setting">
               <label class="qw-label"><?php print $basic['title']; ?>:</label>
@@ -95,8 +93,7 @@
       <?php
         foreach($basics as $basic)
         {
-          if ($basic['type'] == 'page' &&
-              in_array($query_type, $basic['allowed_query_types']))
+          if ($basic['type'] == 'page')
           { ?>
             <div class="qw-setting">
               <?php
@@ -247,10 +244,7 @@
             <?php
               // loop through filters
               foreach($all_filters as $hook_key => $filter)
-              {
-                // for now, this is how I'll prevent certain filters on overrides
-                if(in_array($query_type, $filter['allowed_query_types']))
-                { ?>
+              { ?>
                   <label class="qw-filter-checkbox">
                     <input type="checkbox"
                            value="<?php print $filter['type']; ?>" />
@@ -260,8 +254,7 @@
                   <?php print $filter['title']; ?>
                   </label>
                   <p class="description qw-desc"><?php print $filter['description']; ?></p>
-                  <?php
-                }
+                <?php
               }
             ?>
           </div>

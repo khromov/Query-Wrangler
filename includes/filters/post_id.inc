@@ -58,10 +58,14 @@ function qw_filter_post_id_exposed_process(&$args, $filter, $value){
  * Exposed form
  */
 function qw_filter_post_id_exposed_form($filter)
-{ ?>
+{
+  $submitted = qw_exposed_submitted_data();
+  // default to filter values
+  $values = ($submitted[$filter['exposed_key']]) ? $submitted[$filter['exposed_key']] : $filter['values']['post_ids'];
+  ?>
   <input type="text"
          name="<?php print $filter['exposed_key']; ?>"
-         value="<?php print $_GET[$filter['exposed_key']]; ?>" />
+         value="<?php print $values ?>" />
   <?php
 }
 //function qw_filter_post_id_exposed_settings_form($filter){}

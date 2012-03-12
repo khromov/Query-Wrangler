@@ -15,10 +15,6 @@
     // help text for the user
     'description' => 'Describe this filter',
 
-    // which types of queries to allow this filter on
-    // some filters don't make sense on some query types
-    'allowed_query_types' => array('page','widget','override'),
-
     // (optional) callback for form
     // * This or a template must be used
     // callback function should actually output the form

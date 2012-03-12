@@ -7,26 +7,31 @@ add_filter('qw_contextual_filters', 'qw_contextual_filter_taxonomies');
  */
 function qw_contextual_filter_taxonomies($contextual_filters){
   $ts = get_taxonomies(array('_builtin' => false), 'objects');
+  $builtin = get_taxonomies(array('_builtin' => true), 'objects');
+  $ts['category'] = $builtin['category'];
+  $ts['post_tag'] = $builtin['post_tag'];
+
   if(count($ts) > 0){
     foreach ($ts as $t){
       $contextual_filters['taxonomy_'.$t->name] = array(
         'title' => 'Taxonomy: '. $t->label,
         'description' => 'Select which taxonomies to accept contexts from, and how to treat those taxonomies.',
+        'taxonomy' => $t,
         'form_callback' => 'qw_contextual_filter_taxonomies_form',
-        'allowed_query_types' => array('page','widget'),
-        'query_args_callback' => 'qw_contextual_filter_taxonomies_args',
         // allow this contextual_filter to override pages
         'can_override' => true,
+        'override_form_callback' => 'qw_contextual_filter_taxonomies_override_form',
+        'query_args_callback' => 'qw_contextual_filter_taxonomies_args',
         // additional update callback for saving a query
         'query_update_callback' => 'qw_contextual_filter_taxonomies_query_update',
-        // modify the override options
-        'query_override_options_callback' => 'qw_contextual_filter_taxonomies_override_options',
         // return the appropriate override_id
         'query_override_id_callback' => 'qw_contextual_filter_taxonomies_override_id',
-        // which query op should this context act on?
-        'query_op' => 'tax',
-        'query_var' => $t->query_var,
       );
+
+      // update titles for built in taxonomies
+      if ($t->_builtin){
+        $contextual_filters['taxonomy_'.$t->name]['title'] = $t->label;
+      }
     }
   }
   return $contextual_filters;
@@ -39,56 +44,71 @@ function qw_contextual_filter_taxonomies_args(&$args, $contextual_filter){
   if (!is_array($args['tax_query'])){
     $args['tax_query'] = array();
   }
-  $terms = get_query_var($contextual_filter['query_var']);
-  krumo($terms);
-  $args['tax_query'][] = array(
-    'taxonomy' => $contextual_filter['query_var'],
-    'field' => 'id',
-    'terms' => array_keys($contextual_filter['values']['terms']),
-    'operator' => $filter['values']['operator'],
-  );
-}
 
-/*
- * Return override_options for this contextual filter
- *
- * Basically, add a new filter to the query, and provide it values
- */
-function qw_contextual_filter_taxonomies_override_options($override_id){
-  if ($term = qw_get_term($override_id)){
-    global $wpdb;
-    // get taxonomy data
-    $sql = "SELECT taxonomy FROM ".$wpdb->prefix."term_taxonomy WHERE term_id = ".$term->term_id;
-    $tax = $wpdb->get_row($sql);
+  if (isset($contextual_filter['values']['context']))
+  {
+    // this is the query-wrangler overriden wp_query
+    global $wp_query;
 
-    $options_override = array();
-    $options_override['args']['filters']['context_taxonomy'] = array (
-      'type' => 'taxonomy_'.$tax->taxonomy,
-      'name' => 'taxonomy_'.$tax->taxonomy,
-      'hook_key' => 'taxonomy_'.$tax->taxonomy,
-      'terms' =>  array (
-        $term->term_id => $term->name,
-      ),
-      'operator' => 'IN',
-    );
-    return $options_override;
+    // original wp_query before QW got involved
+    $original_query = $wp_query->original_wp_query;
+
+    // get terms from context
+    switch($contextual_filter['values']['context'])
+    {
+      case 'single':
+        // look for single post data
+        if ($post = $wp_query->post){
+          $terms = get_the_terms($post->ID, $contextual_filter['taxonomy']->name);
+
+          // build values array like filter expects it
+          if (is_array($terms)){
+            $values = array();
+            foreach ($terms as $term){
+              $values[$term->term_id] = $term->slug;
+            }
+          }
+        }
+        break;
+
+      // get terms from global wp_query
+      case 'global_query':
+        $term_slug = $original_query->query_vars[$contextual_filter['taxonomy']->query_var];
+
+        if ($term = qw_get_term($term_slug, 'slug')){
+          $values = array();
+          $values[$term->term_id] = $term->slug;
+        }
+        break;
+    }
+
+    // if we have values, create a new filter for those values
+    if (is_array($values)){
+      // create the new filter
+      $filter = $contextual_filter;
+      $filter['values']['terms'] = $values;
+      $filter['values']['operator'] = $contextual_filter['values']['operator'];
+
+      // leverage existing taxonomy query_args_callback to create the filter
+      qw_filter_taxonomies_args($args, $filter);
+    }
   }
 }
+
 /*
  * Return the appropriate override_id by looking for query_vars
  */
 function qw_contextual_filter_taxonomies_override_id($contextual_filter){
-  $term = get_query_var($contextual_filter['query_var']);
-
+  $term = get_query_var($contextual_filter['taxonomy']->query_var);
   // make sure we only have 1
   if(is_array($term)){
      $term = array_pop($term);
   }
-
   $term = qw_get_term($term, 'slug');
   if(isset($term->term_id)){
     return $term->term_id;
   }
+  return false;
 }
 /*
  *
@@ -100,29 +120,21 @@ function qw_contextual_filter_taxonomies_query_update($contextual_filter){
 }
 
 /*
- * Filter form
+ * Show tax query operator on form
  */
 function qw_contextual_filter_taxonomies_form($contextual_filter)
 {
-  $terms = get_terms($contextual_filter['query_var'], array('hide_empty' => false));
-  ?>
-    <div class="qw-checkboxes">
-      <?php
-        // List all taxonomies as checkboxes
-        foreach($terms as $term)
-        {
-          $term_checked = (isset($contextual_filter['values']['terms'][$term->term_id])) ? 'checked="checked"' : '';
-          ?>
-          <label class="qw-query-checkbox">
-            <input type="checkbox"
-                   name="<?php print $contextual_filter['form_prefix']; ?>[terms][<?php print $term->term_id; ?>]"
-                   value="<?php print $term->name; ?>"
-                   <?php print $term_checked; ?> />
-            <?php print $term->name; ?>
-          </label>
-          <?php
-        }
-      ?>
-    </div>
-  <?php
+  // leverage the filter's forms
+  qw_filter_taxonomies_form_operator($contextual_filter);
+  qw_filter_taxonomies_form_include_children($contextual_filter);
+}
+
+/*
+ * Override Filter form
+ */
+function qw_contextual_filter_taxonomies_override_form($contextual_filter)
+{
+  $terms = get_terms($contextual_filter['taxonomy']->name, array('hide_empty' => false));
+  // leverage the filter's forms
+  qw_filter_taxonomies_form_terms_checkbox($contextual_filter, $terms);
 }

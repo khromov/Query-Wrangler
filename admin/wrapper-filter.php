@@ -54,7 +54,9 @@
                       name='<?php print $filter['form_prefix']; ?>[is_exposed]'
                       <?php print $is_exposed; ?> />
             </p>
-            <p class="description">Exposing a filter allows a site guest to alter the query results with a form.</p>
+            <p class="description">
+              Exposing a filter allows a site guest to alter the query results with a form.
+              <br />If you expose this filter, the values above will act as the default values of the filter.</p>
           </div>
           <div>
             <label class="qw-label">Exposed Label:</label>

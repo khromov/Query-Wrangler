@@ -154,10 +154,10 @@ function qw_edit_query_form(){
   $row = $wpdb->get_row($sql);
 
   $options = qw_unserialize($row->data);
-
+  
   // handlers
   $handlers = qw_preprocess_handlers($options);
-krumo($handlers);
+
   // basic settings
   $basics = qw_all_basic_settings();
 

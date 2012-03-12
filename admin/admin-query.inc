@@ -78,9 +78,15 @@ function qw_update_query($post){
   // hook for presave
   do_action_ref_array('qw_pre_save', array(&$options));
 
-  $new_data = qw_serialize($options);
   $query_id = $post['query-id'];
+  $new_data = qw_serialize($options);
 
+  $type = 'default';
+  if (is_array($options['display']['types'])){
+    $type = implode(',',$options['display']['types']);
+  }
+
+  $page_path = '';
   // update for pages
   if($options['display']['page']['path']){
     $page_path = ($options['display']['page']['path']) ? $options['display']['page']['path'] : '';
@@ -90,15 +96,16 @@ function qw_update_query($post){
     if(substr($page_path, 0, 1) == '/'){
       $page_path = ltrim($page_path, '/');
     }
-
-    $sql = "UPDATE ".$table_name." SET data = '".$new_data."', path = '".$page_path."' WHERE id = ".$query_id;
   }
-
-  // update for widgets
-  else {
-    $sql = "UPDATE ".$table_name." SET data = '".$new_data."' WHERE id = ".$query_id;
-  }
-  $wpdb->query($sql);
+  $data = array(
+    'type' => $type,
+    'path' => $page_path,
+    'data' => $new_data,
+  );
+  $where = array(
+    'id' => $query_id,
+  );
+  $wpdb->update($table_name, $data, $where);
 
 
   // additional override work
@@ -226,6 +233,9 @@ function qw_textarea($value){
  */
 function qw_check_version()
 {
+  //include_once QW_PLUGIN_DIR.'/upgrade.php';
+  //qw_upgrade_15_to_16();
+
   if ($last_version = get_option('qw_plugin_version')) {
     // compare versions
     if ($last_version < QW_VERSION){

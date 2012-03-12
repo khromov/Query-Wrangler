@@ -11,10 +11,6 @@ function qw_filter_meta_key_value($filters){
     'description' => 'Filter for a specific meta_key / meta_value pair.',
     'form_callback' => 'qw_filter_meta_key_value_form',
     'query_args_callback' => 'qw_filter_meta_key_value_args',
-    // exposed
-    //'exposed_form' => 'qw_filter_meta_key_value_exposed_form',
-    //'exposed_process' => 'qw_filter_meta_key_value_exposed_process',
-    //'exposed_settings_form_callback' => 'qw_filter_meta_key_value_exposed_settings_form',
   );
   return $filters;
 }

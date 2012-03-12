@@ -43,11 +43,6 @@ function qw_all_basic_settings(){
       $basics[$hook_key]['form_prefix'] = 'qw-query-options['.$basic['type'].']';
     }
     $basics[$hook_key]['hook_key'] = $hook_key;
-
-    // set default query types to all
-    if (!isset($basic['allowed_query_types'])){
-      $basics[$hook_key]['allowed_query_types'] = array('page','widget','override');
-    }
   }
   return $basics;
 }
@@ -85,12 +80,6 @@ function qw_all_contextual_filters(){
     if(!isset($contextual_filter['type'])){
       $contextual_filters[$hook_key]['type'] = $hook_key;
     }
-
-    // set default query types to all
-    if (!isset($contextual_filter['allowed_query_types'])){
-      $contextual_filters[$hook_key]['allowed_query_types'] = array('page','widget','override');
-    }
-
     // maintain the hook's key
     $contextual_filters[$hook_key]['hook_key'] = $hook_key;
   }
@@ -115,11 +104,6 @@ function qw_all_filters(){
     // set filter's type as a value if not provided by filter
     if(!isset($filter['type'])){
       $filters[$hook_key]['type'] = $hook_key;
-    }
-
-    // set default query types to all
-    if (!isset($filter['allowed_query_types'])){
-      $filters[$hook_key]['allowed_query_types'] = array('page','widget','override');
     }
 
     // maintain the hook's key
@@ -195,11 +179,7 @@ function qw_all_styles(){
 
   foreach($styles as $hook_key => $style){
     $styles[$hook_key]['hook_key'] = $hook_key;
-    $styles[$hook_key]['form_prefix'] = 'qw-query-options[display]['.$hook_key.'_settings]';
-
-    if(!isset($style['settings_key'])){
-      $styles[$hook_key]['settings_key'] = $hook_key.'_settings';
-    }
+    $styles[$hook_key]['form_prefix'] = 'qw-query-options[display][style_settings]['.$hook_key.']';
   }
   return $styles;
 }
@@ -209,6 +189,10 @@ function qw_all_styles(){
  */
 function qw_all_row_styles(){
   $row_styles = apply_filters('qw_row_styles', array());
+  foreach($row_styles as $hook_key => $row_style){
+    $row_styles[$hook_key]['hook_key'] = $hook_key;
+    $row_styles[$hook_key]['form_prefix'] = 'qw-query-options[display][row_style_settings]['.$hook_key.']';
+  }
   return $row_styles;
 }
 
@@ -272,4 +256,18 @@ function qw_default_template_file() {
 function qw_all_wizards(){
   $wizards = apply_filters('qw_wizards', array());
   return $wizards;
+}
+/*
+ * File Styles Hook
+ */
+function qw_all_includes(){
+  $includes = apply_filters('qw_includes', array());
+  return $includes;
+}
+/*
+ * Display types
+ */
+function qw_all_display_types(){
+  $display_types = apply_filters('qw_display_types', array());
+  return $display_types;
 }

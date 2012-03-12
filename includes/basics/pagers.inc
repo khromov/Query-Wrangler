@@ -13,7 +13,6 @@ function qw_basic_settings_pager($basics){
     'type' => 'page',
     'description' => 'Enable pagination for this query.',
     'form_callback' => 'qw_basic_settings_pager_form',
-    'allowed_query_types' => array('page', 'override'),
     'weight' => 0,
   );
   return $basics;
