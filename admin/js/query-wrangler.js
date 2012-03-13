@@ -22,7 +22,7 @@ QueryWrangler.get_preview = function() {
     'options': QueryWrangler.form_backup,
     'query_id': QueryWrangler.query.id
   };
-  
+
   // make ajax call
   jQuery.ajax({
     url: QueryWrangler.ajaxForm,
@@ -36,6 +36,7 @@ QueryWrangler.get_preview = function() {
       jQuery('#qw-show-display-target').html(results.display);
       jQuery('#qw-show-wpquery-target').html(results.wpquery);
       jQuery('#qw-show-query-time').html(results.time);
+      jQuery('#qw-show-template-files').html(results.templates);
     }
   });
   // hide throbber

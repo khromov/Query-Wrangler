@@ -89,7 +89,7 @@
     <div class="qw-query-admin-column">
       <?php
         // add contextual_filters and fields
-        $handler_types = array('contextual_filter','field');
+        $handler_types = array('sort', 'field');
 
         foreach ($handler_types as $type){
           $handler = $handlers[$type];
@@ -103,7 +103,7 @@
     <div class="qw-query-admin-column">
       <?php
         // add sorts and add filters
-        $handler_types = array('sort', 'filter');
+        $handler_types = array('contextual_filter','filter');
 
         foreach ($handler_types as $type){
           $handler = $handlers[$type];

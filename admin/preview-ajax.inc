@@ -34,12 +34,16 @@ $display = "<pre>".htmlentities(print_r($options['display'], true))."</pre>";
 
 $new_query = "<pre>".print_r($qp,true)."</pre>"."<pre>".print_r($wp_query,true)."</pre>";
 
+$templates = "These template files will be searched for relative to your theme folder.<br />
+              To override a query's template, copy the corresponding template from the <span style='font-family: monospace;'>query-wrangler/templates</span> folder to your theme folder (or THEME/templates) and rename it.
+              <pre>".print_r($templates,1)."</pre>";
 // return
 $preview = array(
   'preview' => $preview,
   'args' => $args,
   'display' => $display,
   'wpquery' => $new_query,
+  'templates' => $templates,
 );
 
 do_action_ref_array('qw_post_preview', array(&$preview));

@@ -15,7 +15,7 @@
  *
  * @return string Template HTML
  */
-function theme($template_name = '', $arguments = array())
+function theme($template_name = '', $arguments = array(), $return_template = false)
 {
   if(is_null($arguments)){
     $arguments = array();
@@ -33,6 +33,11 @@ function theme($template_name = '', $arguments = array())
 
     tw_process_template(&$template, $arguments);
     tw_find_template(&$template);
+
+    // for other means of processing or information, like caching
+    if ($return_template){
+      return $template;
+    }
 
     // proceed if file found
     if($template['found_path'] != '')
@@ -71,7 +76,7 @@ function tw_process_template(&$template, $arguments){
   // merge passed arguments into array overriding defaults
   // update the template arguments for preprocess functions
   $template['arguments'] = array_merge($template['arguments'], $arguments);
-  
+
   // if there is a theme based preprocess function, run it on the arguments
   if(function_exists($theme_folder.'_'.$template['name'].'_preprocess')){
     $preprocess = $theme_folder.'_'.$template['name'].'_preprocess';
@@ -154,11 +159,13 @@ function tw_find_template(&$template){
     // look in the theme folder
     if(file_exists($theme_path)){
       $template['found_path'] = $theme_path;
+      $template['found_suggestion'] = $suggestion;
       break;
     }
     // look for file in default path
     else if(file_exists($default_path)){
       $template['found_path'] = $default_path;
+      $template['found_suggestion'] = $suggestion;
       break;
     }
   }

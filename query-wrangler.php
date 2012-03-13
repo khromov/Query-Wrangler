@@ -66,12 +66,12 @@ function qw_includes_default($includes){
   $includes['frontend'][] = QW_PLUGIN_DIR.'/includes/basics/row_styles.inc';
   $includes['frontend'][] = QW_PLUGIN_DIR.'/includes/basics/posts_per_page.inc';
   $includes['frontend'][] = QW_PLUGIN_DIR.'/includes/basics/offset.inc';
+  $includes['frontend'][] = QW_PLUGIN_DIR.'/includes/basics/pagers.inc';
   $includes['frontend'][] = QW_PLUGIN_DIR.'/includes/basics/post_status.inc';
   $includes['frontend'][] = QW_PLUGIN_DIR.'/includes/basics/header.inc';
   $includes['frontend'][] = QW_PLUGIN_DIR.'/includes/basics/footer.inc';
   $includes['frontend'][] = QW_PLUGIN_DIR.'/includes/basics/empty.inc';
   $includes['frontend'][] = QW_PLUGIN_DIR.'/includes/basics/wrapper_settings.inc';
-  $includes['frontend'][] = QW_PLUGIN_DIR.'/includes/basics/pagers.inc';
   $includes['frontend'][] = QW_PLUGIN_DIR.'/includes/basics/page_path.inc';
   $includes['frontend'][] = QW_PLUGIN_DIR.'/includes/basics/page_template.inc';
 

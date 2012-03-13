@@ -45,5 +45,11 @@
           <!-- Query Time -->
         </div>
       </div>
+      <div class="group">
+        <div class="qw-setting-header">Template Files</div>
+        <div id="qw-show-template-files">
+          <!-- Query Time -->
+        </div>
+      </div>
     </div>
   </div>

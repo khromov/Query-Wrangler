@@ -59,7 +59,9 @@ function theme_query_display_rows_preprocess($template)
     // get the specific style
     $style = $all_styles[$template['arguments']['style']];
     // set this template's default path to the style's default path
-    $template['default_path'] = $style['default_path'];
+    if (!empty($style['default_path'])){
+      $template['default_path'] = $style['default_path'];
+    }
   }
   return $template;
 }
