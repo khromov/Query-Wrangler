@@ -288,3 +288,15 @@ function qw_import_page(){
   );
   print theme('admin_wrapper', $args);
 }
+
+/*
+ * Docs Page
+ */
+function qw_docs_page(){
+  // show import page
+  $args = array(
+    'title' => 'Documentation',
+    'content' => theme('query_docs'),
+  );
+  print theme('admin_wrapper', $args);
+}

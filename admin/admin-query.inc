@@ -5,27 +5,33 @@
  * @param $_POST data
  * @return int New Query ID
  */
-function qw_insert_new_query($post){
+function qw_insert_new_query($submitted){
   global $wpdb;
   $table_name = $wpdb->prefix."query_wrangler";
 
   // wizard data
   $wizards = qw_all_wizards();
-  if (isset($wizards[$post['qw-data-wizard']]) &&
-      function_exists($wizards[$post['qw-data-wizard']]['data_callback']))
+  if (isset($wizards[$submitted['qw-data-wizard']]) &&
+      function_exists($wizards[$submitted['qw-data-wizard']]['data_callback']))
   {
-    $wizard = $wizards[$post['qw-data-wizard']];
+    $wizard = $wizards[$submitted['qw-data-wizard']];
     $data = $wizard['data_callback']();
   }
   else {
     $data = qw_wizard_default_data();
   }
 
+  $type = 'default';
+  if (is_array($submitted['qw-display']['types'])){
+    $data['display']['types'] = $submitted['qw-display']['types'];
+    $type = implode(',',$submitted['qw-display']['types']);
+  }
+
   $values = array(
-    'name' => $post['qw-name'],
-    'slug' => qw_make_slug($post['qw-name']),
-    'type' => $post['qw-type'],
-    'path' => ($post['page-path']) ? urlencode($post['page-path']) : NULL,
+    'name' => $submitted['qw-name'],
+    'slug' => qw_make_slug($submitted['qw-name']),
+    'type' => $type,
+    'path' => ($submitted['page-path']) ? urlencode($submitted['page-path']) : NULL,
     'data' => qw_serialize($data),
   );
 
@@ -38,24 +44,13 @@ function qw_insert_new_query($post){
  *
  * @param $_POST data
  */
-function qw_update_query($post){
+function qw_update_query($submitted){
   global $wpdb;
-  $options = $post['qw-query-options'];
+  $options = $submitted['qw-query-options'];
   $handlers = qw_preprocess_handlers($options);
 
   // if you can't tell, i'm having a lot of trouble with slashes
-  $post = array_map( 'stripslashes_deep', $post );
-
-  // look for obvious errors
-  if(empty($options['args']['posts_per_page'])){
-    $options['args']['posts_per_page'] = 5;
-  }
-  if(empty($options['args']['offset'])){
-    $options['args']['offset'] = 0;
-  }
-  if(empty($options['args']['post_status'])){
-    $options['args']['post_status'] = 'publish';
-  }
+  $submitted = array_map( 'stripslashes_deep', $submitted );
 
   // handle page settings
   if(isset($options['display']['page']['template-file']))
@@ -93,7 +88,7 @@ function qw_update_query($post){
     }
   }
 
-  $query_id = $post['query-id'];
+  $query_id = $submitted['query-id'];
 
   $table_name = $wpdb->prefix."query_wrangler";
   $data = array(
@@ -161,15 +156,15 @@ function qw_query_export($query_id){
  * Import a query into the database
  *
  */
-function qw_query_import($post){
+function qw_query_import($submitted){
   global $wpdb;
   $table = $wpdb->prefix."query_wrangler";
 
-  eval(stripslashes($post['import-query']));
+  eval(stripslashes($submitted['import-query']));
 
-  if($post['import-name']){
-    $query['name'] = $post['import-name'];
-    $query['slug'] = qw_make_slug($post['import-name']);
+  if($submitted['import-name']){
+    $query['name'] = $submitted['import-name'];
+    $query['slug'] = qw_make_slug($submitted['import-name']);
   }
   $query['data'] = qw_serialize($query['data']);
   $wpdb->insert($table, $query);

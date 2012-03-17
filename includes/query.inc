@@ -72,7 +72,7 @@ function qw_generate_query_options($query_id, $options_override = array(), $full
 
   // unserealize the stored data
   $options = qw_unserialize($rows[0]->data);
-  
+
   // override options
   if ($full_override) {
     // force a full override
@@ -82,12 +82,17 @@ function qw_generate_query_options($query_id, $options_override = array(), $full
     $options =  array_merge_recursive((array)$options, $options_override);
   }
 
+  $all_styles = qw_all_styles();
+  $style = $all_styles[$options['display']['style']];
+
   // build query_details
   $options['meta'] = array();
   $options['meta']['id'] = $rows[0]->id;
   $options['meta']['slug'] = $rows[0]->slug;
   $options['meta']['name'] = $rows[0]->name;
-  $options['meta']['type'] = $rows[0]->type;
+  $options['meta']['style'] = $style['hook_key'];
+  $options['meta']['template'] = $style['template'];
+  $options['meta']['type'] = $options['display']['types']['this_instance'];
   $options['meta']['pagination'] = (isset($options['args']['paged'])) ? true : false;
   $options['meta']['header'] = $options['display']['header'];
   $options['meta']['footer'] = $options['display']['footer'];

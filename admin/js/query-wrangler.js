@@ -19,6 +19,7 @@ QueryWrangler.get_preview = function() {
   var post_data_form = {
     'action': 'qw_form_ajax',
     'form': 'preview',
+    'type': jQuery('#preview-display-type').val(),
     'options': QueryWrangler.form_backup,
     'query_id': QueryWrangler.query.id
   };

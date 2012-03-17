@@ -73,12 +73,12 @@ function qw_filter_taxonomies_exposed_process(&$args, $filter, $values){
 
   switch ($filter['values']['exposed_settings']['type'])
   {
-    case 'single':
+    case 'select':
       $alter_args = true;
       $filter['values']['terms'] = array($values => 'on');
       break;
 
-    case 'multiple':
+    case 'checkboxes':
       if (is_array($values)){
         $alter_args = true;
         // gather the ters into the array expected by qw_filter_taxonomies_args()
@@ -106,12 +106,12 @@ function qw_filter_taxonomies_exposed_form($filter){
 
   switch ($filter['values']['exposed_settings']['type'])
   {
-    case 'single':
+    case 'select':
       qw_filter_taxonomies_exposed_form_terms_select($filter, $terms);
       break;
 
-    case 'multiple':
-      qw_filter_taxonomies_exposed_form_terms_checkbox($filter, $terms);
+    case 'checkboxes':
+      qw_filter_taxonomies_exposed_form_terms_checkboxes($filter, $terms);
       break;
   }
 }
@@ -123,7 +123,7 @@ function qw_filter_taxonomies_exposed_form($filter){
 function qw_filter_taxonomies_form($filter)
 {
   $terms = get_terms($filter['taxonomy']->name, array('hide_empty' => false));
-  qw_filter_taxonomies_form_terms_checkbox($filter, $terms);
+  qw_filter_taxonomies_form_terms_checkboxes($filter, $terms);
   qw_filter_taxonomies_form_operator($filter);
   qw_filter_taxonomies_form_include_children($filter);
 }
@@ -154,7 +154,7 @@ function qw_filter_taxonomies_exposed_form_terms_select($filter, $terms)
 /*
  * Exposed terms as checkboxes
  */
-function qw_filter_taxonomies_exposed_form_terms_checkbox($filter, $terms)
+function qw_filter_taxonomies_exposed_form_terms_checkboxes($filter, $terms)
 { ?>
   <div class="query-checkboxes">
     <?php
@@ -184,7 +184,7 @@ function qw_filter_taxonomies_exposed_form_terms_checkbox($filter, $terms)
 /*
  * Term checkboxes for admin form
  */
-function qw_filter_taxonomies_form_terms_checkbox($filter, $terms)
+function qw_filter_taxonomies_form_terms_checkboxes($filter, $terms)
 { ?>
   <div class="qw-checkboxes">
     <?php

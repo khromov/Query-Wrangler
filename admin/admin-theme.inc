@@ -55,6 +55,12 @@ function qw_admin_templates($templates){
     'default_path' => QW_PLUGIN_DIR,
   );
 
+  // import query template
+  $templates['query_docs'] = array(
+    'files' => 'docs/index.php',
+    'default_path' => QW_PLUGIN_DIR,
+  );
+
   // useful for plugin admin pages
   $templates['admin_wrapper'] = array(
     'files' => 'admin/wrapper-page.php',

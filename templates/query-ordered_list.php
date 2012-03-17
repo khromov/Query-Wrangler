@@ -2,10 +2,10 @@
 /*
  * Note: For post queries, the post content (compete or excerpt) will appear
  * as the only field within a row.
- * 
+ *
  * $style - field style
  * $rows - a processed array of rows fields and classes
- * $query_details - other query details
+ * $options - all query details
  */
 ?>
 <ol class="query-ordered-list query-<?php print $slug; ?>">

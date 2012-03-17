@@ -45,6 +45,8 @@
       if(isset($filter['exposed_form']))
       {
         $is_exposed = ($filter['values']['is_exposed']) ? 'checked="checked"': '';
+        $limit_values = ($filter['values']['exposed_limit_values']) ? 'checked="checked"': '';
+        $default_values = ($filter['values']['exposed_default_values']) ? 'checked="checked"': '';
         ?>
         <div class="qw-exposed-form">
           <div class="qw-setting">
@@ -57,6 +59,24 @@
             <p class="description">
               Exposing a filter allows a site guest to alter the query results with a form.
               <br />If you expose this filter, the values above will act as the default values of the filter.</p>
+          </div>
+          <div>
+            <label class="qw-label">Limit Values:</label>
+            <p>
+              <input type="checkbox"
+                      name='<?php print $filter['form_prefix']; ?>[exposed_limit_values]'
+                      <?php print $limit_values; ?> />
+            </p>
+            <p class="description">If checked, only the values above will be available to the exposed filter.</p>
+          </div>
+          <div>
+            <label class="qw-label">Default Values:</label>
+            <p>
+              <input type="checkbox"
+                      name='<?php print $filter['form_prefix']; ?>[exposed_default_values]'
+                      <?php print $default_values; ?> />
+            </p>
+            <p class="description">If checked, the values above will be the default values of the exposed filter.</p>
           </div>
           <div>
             <label class="qw-label">Exposed Label:</label>

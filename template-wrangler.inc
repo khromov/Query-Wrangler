@@ -1,6 +1,6 @@
 <?php
 /*
- * Template Wrangler
+ * Template Wrangler 1.1
  *
  * Functions
  * theme() - template some arguments
@@ -15,7 +15,7 @@
  *
  * @return string Template HTML
  */
-function theme($template_name = '', $arguments = array(), $return_template = false)
+function theme($template_name = '', $arguments = array())
 {
   if(is_null($arguments)){
     $arguments = array();
@@ -31,11 +31,23 @@ function theme($template_name = '', $arguments = array(), $return_template = fal
     $template = $templates[$template_name];
     $template['name'] = $template_name;
 
-    tw_process_template(&$template, $arguments);
+    // if not arguments array given, make empty array for future actions
+    if(!is_array($template['arguments'])){
+      $template['arguments'] = array();
+    }
+
+    // merge passed arguments into array overriding defaults
+    // update the template arguments for preprocess functions
+    $template['arguments'] = array_merge($template['arguments'], $arguments);
+
+    // wp style hook for preprocess
+    do_action_ref_array('tw_pre_process_template', array(&$template));
+
+    tw_process_template(&$template);
     tw_find_template(&$template);
 
-    // for other means of processing or information, like caching
-    if ($return_template){
+    // for other means of processing or information
+    if ($template['arguments']['tw_action'] == 'find_only'){
       return $template;
     }
 
@@ -44,6 +56,10 @@ function theme($template_name = '', $arguments = array(), $return_template = fal
     {
       $arguments = $template['arguments'];
       $found_path = $template['found_path'];
+
+      // allow late modifications
+      do_action_ref_array('tw_pre_render_template', array(&$template));
+
       // start output buffer
       ob_start();
 
@@ -61,22 +77,14 @@ function theme($template_name = '', $arguments = array(), $return_template = fal
 }
 
 /*
- * Merge arguments, and setup some default values for template
+ * Look for non-wordpress preprocess functions
  */
-function tw_process_template(&$template, $arguments){
+function tw_process_template(&$template){
   // get theme folder name
   $theme_folder = explode("/", TEMPLATEPATH);
   $theme_folder = array_pop($theme_folder);
 
-  // if not arguments array given, make empty array for future actions
-  if(!is_array($template['arguments'])){
-    $template['arguments'] = array();
-  }
-
-  // merge passed arguments into array overriding defaults
-  // update the template arguments for preprocess functions
-  $template['arguments'] = array_merge($template['arguments'], $arguments);
-
+// DEPRICATED:  will be removed in future versions
   // if there is a theme based preprocess function, run it on the arguments
   if(function_exists($theme_folder.'_'.$template['name'].'_preprocess')){
     $preprocess = $theme_folder.'_'.$template['name'].'_preprocess';
@@ -150,11 +158,10 @@ function tw_find_template(&$template){
     $template['suggestions'][] = $suggestion;
   }
 
-  // loop through suggestions and find existing template
+  // loop through suggestions and find existing template in theme path first
   foreach($template['suggestions'] as $suggestion){
     // easier to read this way
     $theme_path = TEMPLATEPATH.'/'.$suggestion;
-    $default_path = rtrim($template['default_path']).'/'.$suggestion;
 
     // look in the theme folder
     if(file_exists($theme_path)){
@@ -162,11 +169,19 @@ function tw_find_template(&$template){
       $template['found_suggestion'] = $suggestion;
       break;
     }
-    // look for file in default path
-    else if(file_exists($default_path)){
-      $template['found_path'] = $default_path;
-      $template['found_suggestion'] = $suggestion;
-      break;
+  }
+
+  if (!isset($template['found_path'])){
+    // loop through suggestions and find existing template in default path
+    foreach($template['suggestions'] as $suggestion){
+      $default_path = rtrim($template['default_path']).'/'.$suggestion;
+
+      // look for file in default path
+      if(file_exists($default_path)){
+        $template['found_path'] = $default_path;
+        $template['found_suggestion'] = $suggestion;
+        break;
+      }
     }
   }
 }

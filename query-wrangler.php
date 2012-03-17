@@ -99,6 +99,9 @@ function qw_includes_default($includes){
   // sort options
   $includes['frontend'][] = QW_PLUGIN_DIR.'/includes/sorts/sorts.inc';
 
+  // example
+  $includes['frontend'][] = QW_PLUGIN_DIR.'/docs/docs.php';
+
   // admin
   $includes['admin'][] = QW_PLUGIN_DIR.'/admin/admin-theme.inc';
   $includes['admin'][] = QW_PLUGIN_DIR.'/admin/admin-query.inc';
@@ -196,6 +199,7 @@ function qw_menu()
   $create_page  = add_submenu_page( 'query-wrangler', 'Create New Query', 'Add New', 'manage_options', 'qw-create', 'qw_create_query');
   $import_page  = add_submenu_page( 'query-wrangler', 'Import', 'Import', 'manage_options', 'qw-import', 'qw_import_page');
   $settings_page= add_submenu_page( 'query-wrangler', 'Settings', 'Settings', 'manage_options', 'qw-settings', 'qw_settings_page');
+  $docs_page    = add_submenu_page( 'query-wrangler', 'Docs', 'Docs', 'manage_options', 'qw-docs', 'qw_docs_page');
   //$debug_page  = add_submenu_page( 'query-wrangler', 'Debug', 'Debug', 'manage_options', 'qw-debug', 'qw_debug');
 }
 

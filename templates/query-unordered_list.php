@@ -5,7 +5,7 @@
  *
  * $style - field style
  * $rows - a processed array of rows fields and classes
- * $query_details - other query details
+ * $options - all query details
  */
 ?>
 <ul class="query-unformatted query-<?php print $slug; ?>">

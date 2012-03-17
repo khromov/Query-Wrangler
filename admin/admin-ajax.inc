@@ -12,6 +12,7 @@ function qw_form_ajax()
     $options = array();
     parse_str($decode, $options);
     $options['qw-query-options']['args']['paged'] = 1;
+    $options['qw-query-options']['display']['types']['this_instance'] = $_POST['type'];
     $args = array(
       'options' => $options['qw-query-options'],
       'query_id' => $_POST['query_id'],
@@ -72,6 +73,8 @@ function qw_template_scan($options)
   // start building theme arguments
   $wrapper_args = array(
     'slug' => $slug,
+    'type' => $options['display']['types']['this_instance'],
+    'tw_action' => 'find_only',
   );
   // template with wrapper
   $templates['wrapper'] = theme('query_display_wrapper', $wrapper_args, true);
@@ -80,11 +83,13 @@ function qw_template_scan($options)
   $template_args = array(
     'template' => $style['template'],
     'slug' => $slug,
+    'type' => $options['display']['types']['this_instance'],
     'style' => $style['hook_key'],
     'style_settings' => $options['display']['style_settings'][$style['hook_key']],
+    'tw_action' => 'find_only',
   );
   // template the query rows
-  $templates['style'] = theme('query_display_rows', $template_args, true);
+  $templates['style'] = theme('query_display_rows', $template_args);
 
   if ($row_style['hook_key'] == "posts"){
     $row_style_settings = $options['display']['row_style_settings'][$row_style['hook_key']];
@@ -92,9 +97,24 @@ function qw_template_scan($options)
     $template_args = array(
       'template' => 'query-'.$row_style_settings['size'],
       'slug' => $slug,
+      'type' => $options['display']['types']['this_instance'],
       'style' => $row_style_settings['size'],
+      'tw_action' => 'find_only',
     );
-    $templates['row_style'] = theme('query_display_rows', $template_args, true);
+    $templates['row_style'] = theme('query_display_rows', $template_args);
+  }
+
+  if ($row_style['hook_key'] == "fields"){
+    $row_style_settings = $options['display']['row_style_settings'][$row_style['hook_key']];
+
+    $template_args = array(
+      'template' => 'query-field',
+      'slug' => $slug,
+      'type' => $options['display']['types']['this_instance'],
+      'style' => $options['display']['row_style'],
+      'tw_action' => 'find_only',
+    );
+    $templates['row_style'] = theme('query_display_rows', $template_args);
   }
 
   foreach($templates as $k => $template)
@@ -114,6 +134,7 @@ function qw_template_scan($options)
     } else {
       $output[$k]['found'] = '<strong>'.$template['found_path'].'</strong>';
     }
+    //$output[$k]['template'] = $template;
   }
 
   return $output;

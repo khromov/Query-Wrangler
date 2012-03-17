@@ -48,20 +48,45 @@ function qw_filter_post_id_form($filter)
 /*
  * Process submitted exposed form values
  */
-function qw_filter_post_id_exposed_process(&$args, $filter, $value){
-  if(!empty($value)){
-    $args[$filter['compare']] = explode(",", $value);
+function qw_filter_post_id_exposed_process(&$args, $filter, $values){
+  // default values if submitted is empty
+  if(isset($filter['values']['exposed_default_values'])){
+    // value can be '0', so check if null
+    if (is_null($values)){
+      $values = $filter['values']['post_ids'];
+    }
+  }
+
+  // make into array
+  $values = explode(",", $values);
+
+  // check allowed values
+  if (isset($filter['values']['exposed_limit_values'])){
+    // loop through and check allowed values
+    $allowed = explode(",", $filter['values']['post_ids']);
+    foreach($values as $k => $value){
+      if (!in_array($value, $allowed)){
+        unset($values[$k]);
+      }
+    }
+    $args[$filter['compare']] = $values;
+  }
+  else {
+    $args[$filter['compare']] = $values;
   }
 }
 
 /*
  * Exposed form
  */
-function qw_filter_post_id_exposed_form($filter)
+function qw_filter_post_id_exposed_form($filter, $values)
 {
-  $submitted = qw_exposed_submitted_data();
-  // default to filter values
-  $values = ($submitted[$filter['exposed_key']]) ? $submitted[$filter['exposed_key']] : $filter['values']['post_ids'];
+  // default values
+  if (isset($filter['values']['exposed_default_values'])){
+    if (is_null($values)){
+      $values = $filter['values']['post_ids'];
+    }
+  }
   ?>
   <input type="text"
          name="<?php print $filter['exposed_key']; ?>"

@@ -9,6 +9,10 @@
           Live Preview
         </label>
       <?php } ?>
+      <select id="preview-display-type" name="preview-display-type">
+        <option value="page">Page</option>
+        <option value="widget">Widget</option>
+      </select>
       <div id="get-preview" class="qw-button">Preview</div>
     </div>
 
@@ -28,26 +32,26 @@
         </div>
       </div>
       <div class="group">
-        <div class="qw-setting-header">Display Settings</div>
-        <div id="qw-show-display-target">
-          <!-- display -->
-        </div>
-      </div>
-      <div class="group">
         <div class="qw-setting-header">Resulting WP_Query Object</div>
         <div id="qw-show-wpquery-target">
           <!-- WP_Query -->
         </div>
       </div>
       <div class="group">
-        <div class="qw-setting-header">Query Time</div>
-        <div id="qw-show-query-time">
-          <!-- Query Time -->
+        <div class="qw-setting-header">Display Settings</div>
+        <div id="qw-show-display-target">
+          <!-- display -->
         </div>
       </div>
       <div class="group">
         <div class="qw-setting-header">Template Files</div>
         <div id="qw-show-template-files">
+          <!-- Query Time -->
+        </div>
+      </div>
+      <div class="group">
+        <div class="qw-setting-header">Query Time</div>
+        <div id="qw-show-query-time">
           <!-- Query Time -->
         </div>
       </div>

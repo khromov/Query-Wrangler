@@ -95,9 +95,8 @@ function qw_exposed_submitted_data(){
   else if (!empty($_POST)){
     $data = $_POST;
   }
-
   foreach($data as $k => $v){
-    if (empty($data[$k])){
+    if (is_null($data[$k])){
       unset($data[$k]);
       unset($_GET[$k]);
       unset($_POST[$k]);
@@ -125,6 +124,12 @@ function qw_theme_single_exposed_handler($item){
   if(empty($item['exposed_key'])){
     $item['exposed_key'] = 'exposed_'.$item['name'];
   }
+  // gather submitted values
+  $submitted = qw_exposed_submitted_data();
+  $values = '';
+  if (isset($submitted[$item['exposed_key']])){
+    $values = $submitted[$item['exposed_key']];
+  }
   ob_start();
   ?>
     <div class="query-exposed-<?php print $item['name']; ?>">
@@ -134,11 +139,11 @@ function qw_theme_single_exposed_handler($item){
         </label>
       <?php } ?>
       <!-- exposed-<?php print $item['name']; ?> -->
-      <?php $item['exposed_form']($item); ?>
+      <?php $item['exposed_form']($item, $values); ?>
 
       <?php if (!empty($item['values']['exposed_desc'])) { ?>
         <div class="query-exposed-description query-exposed-description-<?php print $item['name']; ?>">
-          <?php print $item['values']['exposed_label']; ?>
+          <?php print $item['values']['exposed_desc']; ?>
         </div>
       <?php } ?>
     </div>
@@ -152,8 +157,8 @@ function qw_theme_single_exposed_handler($item){
 function qw_exposed_setting_type($filter)
 {
   $opts = array(
-    'single' => 'Single',
-    'multiple' => 'Multiple',
+    'select' => 'Select',
+    'checkboxes' => 'Checkboxes',
   );
   ?>
   <div>

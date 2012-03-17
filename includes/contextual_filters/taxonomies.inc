@@ -136,5 +136,5 @@ function qw_contextual_filter_taxonomies_override_form($contextual_filter)
 {
   $terms = get_terms($contextual_filter['taxonomy']->name, array('hide_empty' => false));
   // leverage the filter's forms
-  qw_filter_taxonomies_form_terms_checkbox($contextual_filter, $terms);
+  qw_filter_taxonomies_form_terms_checkboxes($contextual_filter, $terms);
 }

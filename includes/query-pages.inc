@@ -95,7 +95,7 @@ function qw_query_pages_handler()
 
   // page op is based on WP tags like is_category() && is_404()
   $op = qw_get_page_op();
-  
+
   // we only handle sepcific types of pages and overrides
   if(in_array($op, $handled_ops))
   {
@@ -159,6 +159,7 @@ function qw_query_pages_handler()
 $_SESSION['qw']['time']['page_load']['start'] = microtime(1);
       // pass the paged value into the query
       $options_override['args']['paged'] = $paged;
+      $options_override['display']['types']['this_instance'] = 'page';
 
       // actual options
       $options = qw_unserialize($query->data);

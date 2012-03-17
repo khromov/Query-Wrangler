@@ -18,29 +18,60 @@ function qw_templates($templates){
   // display queries style wrapper
   $templates['query_display_wrapper'] = array(
     'files' => array(
+      'templates/query-wrapper-[slug]-[type].php',
       'templates/query-wrapper-[slug].php',
+      'templates/query-wrapper-[type].php',
       'templates/query-wrapper.php',
+      'query-wrapper-[slug]-[type].php',
       'query-wrapper-[slug].php',
+      'query-wrapper-[type].php',
       'query-wrapper.php',
     ),
     'default_path' => QW_PLUGIN_DIR,
     'arguments' => array(
+      'type' => '',
       'slug' => '',
     )
   );
-  // full and field styles
-  $templates['query_display_rows'] = array(
+  // styles
+  $templates['query_display_style'] = array(
     'files' => array(
+      'templates/[template]-[slug]-[type].php',
       'templates/[template]-[slug].php',
+      'templates/[template]-[type].php',
       'templates/[template].php',
+      '[template]-[slug]-[type].php',
       '[template]-[slug].php',
+      '[template]-[type].php',
       '[template].php',
     ),
     'default_path' => QW_PLUGIN_DIR,
     'arguments' => array(
       'template' => 'query-unformatted',
+      'type' => '',
       'slug' => 'not-found',
       'style' => 'unformatted',
+      'rows' => array(),
+    )
+  );
+  // row styles
+  $templates['query_display_rows'] = array(
+    'files' => array(
+      'templates/[template]-[slug]-[type].php',
+      'templates/[template]-[slug].php',
+      'templates/[template]-[type].php',
+      'templates/[template].php',
+      '[template]-[slug]-[type].php',
+      '[template]-[slug].php',
+      '[template]-[type].php',
+      '[template].php',
+    ),
+    'default_path' => QW_PLUGIN_DIR,
+    'arguments' => array(
+      'template' => 'query-complete',
+      'type' => '',
+      'slug' => 'not-found',
+      'row_style' => 'posts',
       'rows' => array(),
     )
   );
@@ -82,22 +113,21 @@ function qw_template_query(&$wp_query, $options)
 
   // start building theme arguments
   $wrapper_args = array(
+    'type' => $options['meta']['type'],
     'slug' => $options['meta']['slug'],
+    'style' => $options['meta']['style'],
   );
 
   // look for empty results
   if ($results_count > 0)
   {
-    $all_styles = qw_all_styles();
-
-    $style = $all_styles[$options['display']['style']];
-
     // setup row template arguments
     $template_args = array(
-      'template' => $style['template'],
+      'template' => $options['meta']['template'],
+      'type' => $options['meta']['type'],
       'slug' => $options['meta']['slug'],
-      'style' => $style['hook_key'],
-      'style_settings' => $options['display']['style_settings'][$style['hook_key']],
+      'style' => $options['meta']['style'],
+      'style_settings' => $options['display']['style_settings'][$options['meta']['style']],
       'options' => $options,
     );
     // the content of the widget is the result of the query
@@ -110,7 +140,7 @@ function qw_template_query(&$wp_query, $options)
     }
 
     // template the query rows
-    $wrapper_args['content'] = theme('query_display_rows', $template_args);
+    $wrapper_args['content'] = theme('query_display_style', $template_args);
   }
   // empty results
   else {
@@ -167,7 +197,9 @@ function qw_make_posts_rows(&$wp_query, $options){
     $template_args = array(
       'template' => 'query-'.$row_style_settings['size'],
       'slug' => $options['meta']['slug'],
-      'style' => $row_style_settings['size'],
+      'style' => $options['meta']['style'],
+      'row_style' => $options['display']['row_style'],
+      'type' => $options['meta']['type'],
     );
     $rows[$i]['row_classes'] = qw_row_classes($i);
     $field_classes = array('query-post-wrapper');
@@ -182,7 +214,7 @@ function qw_make_posts_rows(&$wp_query, $options){
  */
 function qw_row_classes($i){
   $row_classes   = array('query-row');
-  $row_classes[] = ($i%2) ? 'query-row-odd' : 'query-row-even';
+  $row_classes[] = ($i%2) ? 'query-row-odd odd' : 'query-row-even even';
   $row_classes[] = 'query-row-'.$i;
 
   return implode(" ", $row_classes);
@@ -269,7 +301,6 @@ function qw_make_fields_rows(&$wp_query, $options)
 
         // apply labels to full style fields
         if(isset($field['values']['has_label']) &&
-           $display['type'] != 'full' &&
            $display['style'] != 'table')
         {
           $rows[$i]['fields'][$field_name]['output'] = '<label class="query-label">'.$field['values']['label'].'</label> '.$rows[$i]['fields'][$field_name]['output'];
@@ -279,8 +310,23 @@ function qw_make_fields_rows(&$wp_query, $options)
         $rows[$i]['fields'][$field_name]['output'] = do_shortcode($rows[$i]['fields'][$field_name]['output']);
 
         // after all operations, remove if excluded
-        if($field['values']['exclude_display']){
+        // do this late to allow the field to work properly if used as a token
+        if ($field['values']['exclude_display']){
           unset($rows[$i]['fields'][$field_name]['output']);
+        }
+        else{
+          $template_args = array(
+            'template' => 'query-field',
+            'slug' => $options['meta']['slug'],
+            'style' => $options['meta']['style'],
+            'row_style' => $options['display']['row_style'],
+            'type' => $options['meta']['type'],
+            'options' => $options,
+            'row' => $rows[$i],
+            'field' => $rows[$i]['fields'][$field_name],
+            'output' => $rows[$i]['fields'][$field_name]['output'],
+          );
+          $rows[$i]['fields'][$field_name]['output'] = theme('query_display_rows' , $template_args);
         }
       }
     }

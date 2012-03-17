@@ -5,7 +5,7 @@
  *
  * $style - field style
  * $rows - a processed array of rows fields and classes
- * $query_details - other query details
+ * $options - all query details
  */
 ?>
 <table class="query-table query-<?php print $slug; ?>" cellpadding="0" cellspacing="0" border="0">

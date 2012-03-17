@@ -33,19 +33,37 @@ function qw_filter_meta_key_form($filter)
 /*
  * Process submitted exposed form values
  */
-function qw_filter_meta_key_exposed_process(&$args, $filter, $value){
-  if(!empty($value)){
-    $args['meta_key'] = $value;
+function qw_filter_meta_key_exposed_process(&$args, $filter, $values){
+  // default values if submitted is empty
+  if(isset($filter['values']['exposed_default_values'])){
+    // value can be '0', so check if null
+    if (is_null($values)){
+      $values = $filter['values']['meta_key'];
+    }
+  }
+
+  // check allowed values
+  if (isset($filter['values']['exposed_limit_values'])){
+    if ($values == $filter['values']['meta_key']){
+      $args['meta_key'] = $values;
+    }
+  }
+  else {
+    $args['meta_key'] = $values;
   }
 }
 
 /*
  * Exposed form
  */
-function qw_filter_meta_key_exposed_form($filter)
+function qw_filter_meta_key_exposed_form($filter, $values)
 {
-  $submitted = qw_exposed_submitted_data();
-  $values = ($submitted[$filter['exposed_key']]) ? $submitted[$filter['exposed_key']] : $filter['values']['meta_key'];
+  // default values
+  if (isset($filter['values']['exposed_default_values'])){
+    if (is_null($values)){
+      $values = $filter['values']['meta_key'];
+    }
+  }
   ?>
   <input type="text"
          name="<?php print $filter['exposed_key']; ?>"

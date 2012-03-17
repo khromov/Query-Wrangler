@@ -11,6 +11,10 @@ function qw_filter_post_types($filters){
     'description' => 'Select which post types should be shown.',
     'form_callback' => 'qw_filter_post_types_form',
     'query_args_callback' => 'qw_filter_post_types_args',
+        // exposed
+        'exposed_form' => 'qw_filter_post_types_exposed_form',
+        'exposed_process' => 'qw_filter_post_types_exposed_process',
+        'exposed_settings_form_callback' => 'qw_filter_post_types_exposed_settings_form',
   );
   return $filters;
 }
@@ -42,6 +46,127 @@ function qw_filter_post_types_form($filter)
                  value="<?php print $post_type; ?>"
                  <?php print $post_type_checked; ?> />
           <?php print ucfirst($post_type); ?>
+        </label>
+        <?php
+      }
+    ?>
+  </div>
+  <?php
+}
+
+
+/*
+ * Exposed settings form
+ */
+function qw_filter_post_types_exposed_settings_form($filter)
+{
+  // use the default provided single/multiple exposed values
+  // saves values to [exposed_settings][type]
+  print qw_exposed_setting_type($filter);
+}
+/*
+ * Process submitted exposed form values
+ */
+function qw_filter_post_types_exposed_process(&$args, $filter, $values){
+  $alter_args = false;
+  
+  switch ($filter['values']['exposed_settings']['type'])
+  {
+    case 'select':
+      $alter_args = true;
+      $filter['values']['post_types'] = array($values => $values);
+      break;
+
+    case 'checkboxes':
+      if (is_array($values)){
+        $alter_args = true;
+        // gather the ters into the array expected by qw_filter_post_types_args()
+        $post_types = array();
+        foreach($values as $v){
+          $post_types[$v] = $v;
+        }
+        $filter['values']['post_types'] = $post_types;
+      }
+      break;
+  }
+
+  if ($alter_args){
+    qw_filter_post_types_args(&$args, $filter);
+  }
+}
+/*
+ * Exposed forms
+ */
+function qw_filter_post_types_exposed_form($filter){
+  // terms
+  $submitted = qw_exposed_submitted_data();
+  $filter['values']['post_types'] = $submitted[$filter['exposed_key']];
+
+  switch ($filter['values']['exposed_settings']['type'])
+  {
+    case 'select':
+      qw_filter_post_types_exposed_form_terms_select($filter);
+      break;
+
+    case 'checkboxes':
+      qw_filter_post_types_exposed_form_terms_checkboxes($filter);
+      break;
+  }
+}
+
+
+/*
+ * Exposed terms as select box
+ */
+function qw_filter_post_types_exposed_form_terms_select($filter)
+{
+  $post_types = qw_all_post_types();
+  ?>
+  <div class="query-select">
+    <select name="<?php print $filter['exposed_key']; ?>">
+      <?php
+        foreach($post_types as $type)
+        {
+          $type_selected = (in_array($type, $filter['values']['post_types'])) ? 'selected="selected"' : '';
+          ?>
+            <option value="<?php print $type; ?>"<?php print $type_selected; ?> >
+              <?php print ucfirst($type); ?>
+            </option>
+          <?php
+        }
+      ?>
+    </select>
+  </div>
+  <?php
+}
+
+/*
+ * Exposed terms as checkboxes
+ */
+function qw_filter_post_types_exposed_form_terms_checkboxes($filter)
+{
+  $post_types = qw_all_post_types();
+  ?>
+  <div class="query-checkboxes">
+    <?php
+      // List all categories as checkboxes
+      foreach($post_types as $type)
+      {
+        if (is_array($filter['values']['post_types'])){
+
+          if (in_array($type, $filter['values']['post_types'])) {
+            $type_checked = 'checked="checked"';
+          } else {
+            $type_checked = '';
+          }
+        }
+        ?>
+        <label class="query-checkbox">
+          <input type="checkbox"
+                 name="<?php print $filter['exposed_key']; ?>[]"
+                 value="<?php print $type; ?>"
+                 <?php print $type_checked; ?> />
+          <?php print ucfirst($type); ?>
         </label>
         <?php
       }
