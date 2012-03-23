@@ -69,18 +69,19 @@ function qw_filter_post_types_exposed_settings_form($filter)
  */
 function qw_filter_post_types_exposed_process(&$args, $filter, $values){
   $alter_args = false;
-  
+  qw_filter_post_types_exposed_default_values($filter, $values);
+
   switch ($filter['values']['exposed_settings']['type'])
   {
     case 'select':
       $alter_args = true;
-      $filter['values']['post_types'] = array($values => $values);
+      $filter['values']['post_types'] = $values;
       break;
 
     case 'checkboxes':
       if (is_array($values)){
         $alter_args = true;
-        // gather the ters into the array expected by qw_filter_post_types_args()
+        // gather the post types into the array expected by qw_filter_post_types_args()
         $post_types = array();
         foreach($values as $v){
           $post_types[$v] = $v;
@@ -97,10 +98,9 @@ function qw_filter_post_types_exposed_process(&$args, $filter, $values){
 /*
  * Exposed forms
  */
-function qw_filter_post_types_exposed_form($filter){
-  // terms
-  $submitted = qw_exposed_submitted_data();
-  $filter['values']['post_types'] = $submitted[$filter['exposed_key']];
+function qw_filter_post_types_exposed_form($filter, $values){
+  // adjust for default values
+  qw_filter_post_types_exposed_default_values($filter, $values);
 
   switch ($filter['values']['exposed_settings']['type'])
   {
@@ -114,6 +114,16 @@ function qw_filter_post_types_exposed_form($filter){
   }
 }
 
+/*
+ * Simple helper funtion to handle default values
+ */
+function qw_filter_post_types_exposed_default_values($filter, &$values){
+  if (isset($filter['values']['exposed_default_values'])){
+    if (is_null($values)){
+      $values = $filter['values']['post_types'];
+    }
+  }
+}
 
 /*
  * Exposed terms as select box
@@ -121,6 +131,8 @@ function qw_filter_post_types_exposed_form($filter){
 function qw_filter_post_types_exposed_form_terms_select($filter)
 {
   $post_types = qw_all_post_types();
+  // adjust for allowed values
+  qw_filter_post_types_exposed_limit_values($filter, $post_types);
   ?>
   <div class="query-select">
     <select name="<?php print $filter['exposed_key']; ?>">
@@ -129,7 +141,7 @@ function qw_filter_post_types_exposed_form_terms_select($filter)
         {
           $type_selected = (in_array($type, $filter['values']['post_types'])) ? 'selected="selected"' : '';
           ?>
-            <option value="<?php print $type; ?>"<?php print $type_selected; ?> >
+            <option value="<?php print $type; ?>" <?php print $type_selected; ?>>
               <?php print ucfirst($type); ?>
             </option>
           <?php
@@ -146,6 +158,8 @@ function qw_filter_post_types_exposed_form_terms_select($filter)
 function qw_filter_post_types_exposed_form_terms_checkboxes($filter)
 {
   $post_types = qw_all_post_types();
+  // adjust for allowed values
+  qw_filter_post_types_exposed_limit_values($filter, $post_types);
   ?>
   <div class="query-checkboxes">
     <?php
@@ -153,7 +167,7 @@ function qw_filter_post_types_exposed_form_terms_checkboxes($filter)
       foreach($post_types as $type)
       {
         if (is_array($filter['values']['post_types'])){
-
+          // see if our submitted value is
           if (in_array($type, $filter['values']['post_types'])) {
             $type_checked = 'checked="checked"';
           } else {
@@ -173,4 +187,16 @@ function qw_filter_post_types_exposed_form_terms_checkboxes($filter)
     ?>
   </div>
   <?php
+}
+/*
+ * Simple helper function to determine values with consideration for defaults
+ */
+function qw_filter_post_types_exposed_limit_values($filter, &$post_types){
+  if (isset($filter['values']['exposed_limit_values']) && is_array($filter['values']['post_types'])){
+    foreach ($post_types as $k => $type){
+      if (!in_array($type, $filter['values']['post_types'])){
+        unset($post_types[$k]);
+      }
+    }
+  }
 }

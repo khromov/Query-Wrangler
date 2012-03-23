@@ -228,8 +228,10 @@ function qw_row_classes($i){
  */
 function qw_make_fields_rows(&$wp_query, $options)
 {
+  // TODO: this is bad, right? we process forms and everything on output...
+  $handlers = qw_preprocess_handlers($options);
   $display = $options['display'];
-  $all_fields = qw_all_fields();
+  $display['fields'] = $handlers['field']['items'];
   $rows = array();
   $tokens = array();
 
@@ -237,9 +239,11 @@ function qw_make_fields_rows(&$wp_query, $options)
   $i = 0;
   while($wp_query->have_posts())
   {
+    // get this post
     $wp_query->the_post();
-    //
     $this_post = $wp_query->post;
+
+    // init the row
     $rows[$i] = array();
 
     // make row classes
@@ -247,9 +251,6 @@ function qw_make_fields_rows(&$wp_query, $options)
 
     if(is_array($display['fields']))
     {
-      // sort according to weights
-      uasort($display['fields'],'qw_cmp');
-
       // loop through each field
       foreach($display['fields'] as $field_name => $field_values)
       {
@@ -265,7 +266,7 @@ function qw_make_fields_rows(&$wp_query, $options)
         $rows[$i]['fields'][$field_name]['classes'] = implode(" ",$field_classes);
 
         // look for callback
-        if(isset($field['output_callback']))
+        if(isset($field['output_callback']) && function_exists($field['output_callback']))
         {
           // callbacks with token arguments
           if ($field['output_arguments']){

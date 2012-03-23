@@ -107,7 +107,7 @@ function qw_query_pages_handler()
 
     // Clean the result for DB
     $path = $wpdb->escape($wp_query->query['pagename']);
-
+krumo($wp_query);
     // fix the query paging
     if($paged = qw_get_page_number($wp_query)){
       $wp_query->query_vars['paged'] = $paged;

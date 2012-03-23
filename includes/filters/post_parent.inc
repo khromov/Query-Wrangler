@@ -34,12 +34,7 @@ function qw_filter_post_parent_form($filter)
  */
 function qw_filter_post_parent_exposed_process(&$args, $filter, $values){
   // default values if submitted is empty
-  if(isset($filter['values']['exposed_default_values'])){
-    // value can be '0', so check if null
-    if (is_null($values)){
-      $values = $filter['values']['post_parent'];
-    }
-  }
+  qw_filter_post_parent_exposed_default_values($filter, $values);
 
   // check allowed values
   if (isset($filter['values']['exposed_limit_values'])){
@@ -58,11 +53,7 @@ function qw_filter_post_parent_exposed_process(&$args, $filter, $values){
 function qw_filter_post_parent_exposed_form($filter, $values)
 {
   // default values
-  if (isset($filter['values']['exposed_default_values'])){
-    if (is_null($values)){
-      $values = $filter['values']['post_parent'];
-    }
-  }
+  qw_filter_post_parent_exposed_default_values($filter, $values);
   ?>
   <input type="text"
          name="<?php print $filter['exposed_key']; ?>"
@@ -70,3 +61,13 @@ function qw_filter_post_parent_exposed_form($filter, $values)
   <?php
 }
 //function qw_filter_post_parent_exposed_settings_form($filter){}
+/*
+ * Simple helper funtion to handle default values
+ */
+function qw_filter_post_parent_exposed_default_values($filter, &$values){
+  if (isset($filter['values']['exposed_default_values'])){
+    if (is_null($values)){
+      $values = $filter['values']['post_parent'];
+    }
+  }
+}

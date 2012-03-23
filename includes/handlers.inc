@@ -118,6 +118,9 @@ function qw_preprocess_handlers($options){
     // load all our default handlers
     if (is_array($handler['items']))
     {
+      // sort according to weights
+      uasort($handler['items'],'qw_cmp');
+
       $all = $handler['all_items'];
 
       // generate the form name prefixes
@@ -128,15 +131,16 @@ function qw_preprocess_handlers($options){
 
         $this_item = $all[$hook_key];
 
-        // move type, hook_key, and weight to top level of array
-        $this_item['type'] = $values['type']; unset($values['type']);
-        $this_item['weight'] = $values['weight']; unset($values['weight']);
-        $this_item['hook_key'] = $values['hook_key']; unset($values['hook_key']);
+        // copy type, hook_key, and weight to top level of array
+
+        $this_item['name'] = $name;
+        $this_item['type'] = $values['type'];
+        $this_item['weight'] = $values['weight'];
+        $this_item['hook_key'] = $values['hook_key'];
+        $this_item['form_prefix'] = $handler['form_prefix'].'['.$name.']';
 
         // values are own array
         $this_item['values'] = $values;
-        $this_item['name'] = $name;
-        $this_item['form_prefix'] = $handler['form_prefix'].'['.$name.']';
 
         qw_handler_make_form($this_item);
 

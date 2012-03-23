@@ -132,7 +132,9 @@ function qw_filter_taxonomies_form($filter)
  * Exposed terms as select box
  */
 function qw_filter_taxonomies_exposed_form_terms_select($filter, $terms)
-{ ?>
+{
+  qw_filter_taxonomies_exposed_limit_values($filter, $terms);
+  ?>
   <div class="query-select">
     <select name="<?php print $filter['exposed_key']; ?>">
       <?php
@@ -155,7 +157,9 @@ function qw_filter_taxonomies_exposed_form_terms_select($filter, $terms)
  * Exposed terms as checkboxes
  */
 function qw_filter_taxonomies_exposed_form_terms_checkboxes($filter, $terms)
-{ ?>
+{
+  qw_filter_taxonomies_exposed_limit_values($filter, $terms);
+  ?>
   <div class="query-checkboxes">
     <?php
       // List all categories as checkboxes
@@ -245,4 +249,19 @@ function qw_filter_taxonomies_form_include_children($filter)
     <p class="description clear-left">Include the term's children.</p>
   </div>
   <?php
+}
+
+/*
+ * Simple helper function to determine values with consideration for defaults
+ */
+function qw_filter_taxonomies_exposed_limit_values($filter, &$terms){
+      krumo($terms);
+      krumo($filter['values']);
+  if (isset($filter['values']['exposed_limit_values']) && is_array($filter['values']['terms'])){
+    foreach ($terms as $k => $term){
+      if (!in_array($term, $filter['values']['terms'])){
+        unset($terms[$k]);
+      }
+    }
+  }
 }
