@@ -98,10 +98,8 @@ function qw_filter_taxonomies_exposed_process(&$args, $filter, $values){
 /*
  * Exposed forms
  */
-function qw_filter_taxonomies_exposed_form($filter){
-  // terms
-  $submitted = qw_exposed_submitted_data();
-  $filter['values']['terms'] = $submitted[$filter['exposed_key']];
+function qw_filter_taxonomies_exposed_form($filter, $values){
+  $filter['values']['terms'] = $values;
   $terms = get_terms($filter['taxonomy']->name, array('hide_empty' => false));
 
   switch ($filter['values']['exposed_settings']['type'])
@@ -133,6 +131,11 @@ function qw_filter_taxonomies_form($filter)
  */
 function qw_filter_taxonomies_exposed_form_terms_select($filter, $terms)
 {
+  // handle submitted values
+  if (isset($filter['values']['terms'])){
+    $filter['values']['terms'] = array($filter['values']['terms'] => $filter['values']['terms']);
+  }
+
   qw_filter_taxonomies_exposed_limit_values($filter, $terms);
   ?>
   <div class="query-select">
@@ -158,6 +161,20 @@ function qw_filter_taxonomies_exposed_form_terms_select($filter, $terms)
  */
 function qw_filter_taxonomies_exposed_form_terms_checkboxes($filter, $terms)
 {
+  // adjust for submitted values
+  $values = $filter['values']['terms'];
+  if (!empty($values)){
+    if (is_array($values)){
+      $filter['values']['terms'] = array();
+      foreach($values as $value){
+        $filter['values']['terms'][$value] = $value;
+      }
+    }
+    else {
+      $filter['values']['terms'] = array($values => $values);
+    }
+  }
+  
   qw_filter_taxonomies_exposed_limit_values($filter, $terms);
   ?>
   <div class="query-checkboxes">
@@ -255,8 +272,6 @@ function qw_filter_taxonomies_form_include_children($filter)
  * Simple helper function to determine values with consideration for defaults
  */
 function qw_filter_taxonomies_exposed_limit_values($filter, &$terms){
-      krumo($terms);
-      krumo($filter['values']);
   if (isset($filter['values']['exposed_limit_values']) && is_array($filter['values']['terms'])){
     foreach ($terms as $k => $term){
       if (!in_array($term, $filter['values']['terms'])){

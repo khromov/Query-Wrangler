@@ -105,11 +105,11 @@ function qw_filter_post_types_exposed_form($filter, $values){
   switch ($filter['values']['exposed_settings']['type'])
   {
     case 'select':
-      qw_filter_post_types_exposed_form_terms_select($filter);
+      qw_filter_post_types_exposed_form_select($filter, $values);
       break;
 
     case 'checkboxes':
-      qw_filter_post_types_exposed_form_terms_checkboxes($filter);
+      qw_filter_post_types_exposed_form_checkboxes($filter, $values);
       break;
   }
 }
@@ -126,10 +126,15 @@ function qw_filter_post_types_exposed_default_values($filter, &$values){
 }
 
 /*
- * Exposed terms as select box
+ * Exposed post types as select box
  */
-function qw_filter_post_types_exposed_form_terms_select($filter)
+function qw_filter_post_types_exposed_form_select($filter, $values)
 {
+  // set submitted values
+  if (isset($values)){
+    $filter['values']['post_types'] = array($values => $values);
+  }
+
   $post_types = qw_all_post_types();
   // adjust for allowed values
   qw_filter_post_types_exposed_limit_values($filter, $post_types);
@@ -153,10 +158,22 @@ function qw_filter_post_types_exposed_form_terms_select($filter)
 }
 
 /*
- * Exposed terms as checkboxes
+ * Exposed post types as checkboxes
  */
-function qw_filter_post_types_exposed_form_terms_checkboxes($filter)
+function qw_filter_post_types_exposed_form_checkboxes($filter, $values)
 {
+  // adjust for submitted values
+  if (!empty($values)){
+    if(is_array($values)){
+      $filter['values']['post_types'] = array();
+      foreach($values as $value){
+        $filter['values']['post_types'][$value] = $value;
+      }
+    }
+    else {
+      $filter['values']['post_types'] = array($values => $values);
+    }
+  }
   $post_types = qw_all_post_types();
   // adjust for allowed values
   qw_filter_post_types_exposed_limit_values($filter, $post_types);

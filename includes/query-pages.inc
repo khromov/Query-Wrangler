@@ -1,4 +1,8 @@
 <?php
+// hooks
+add_filter('request', 'qw_remove_page_from_query_string');
+add_action('wp', 'qw_query_pages_handler');
+
 // http://wordpress.org/support/topic/explanation-and-workaround-for-error-404-on-category-pagination?replies=3
 // http://wordpress.org/extend/plugins/category-pagination-fix/
 
@@ -19,7 +23,6 @@ function qw_remove_page_from_query_string($query_string)
 
   return $query_string;
 }
-add_filter('request', 'qw_remove_page_from_query_string');
 
 // http://codex.wordpress.org/Conditional_Tags
 function qw_get_page_op()
@@ -74,10 +77,51 @@ function qw_get_page_op()
   }
   return $op;
 }
+
 /*
- * Query pages
+ * Handle the qw path for pages
  */
-add_action('wp', 'qw_query_pages_handler');
+function qw_get_path(){
+  global $wpdb;
+
+  $path = $_SERVER['REQUEST_URI'];
+  // Look at the requested uri w/o paginiation involved
+  $page_array = explode('/page/', $_SERVER['REQUEST_URI']);
+  if (isset($page_array[0])){
+    $path = $page_array[0];
+  }
+
+  // look for get variables
+  $get_array = explode('?', $path);
+  if (isset($get_array[0])){
+    $path = $get_array[0];
+  }
+
+  // Clean the result for DB
+  $path = $wpdb->escape(ltrim($path,'/'));
+  
+  return $path;
+}
+
+/*
+ * Alter the toolbar edit menu
+ */
+function qw_before_admin_bar_render() {
+  global $wp_admin_bar, $wp_query;
+
+  if ($wp_query->query_wrangler['query_id']){
+    $edit_query = array(
+      'title' => 'Edit Query',
+      'href' => '/wp-admin/admin.php?page=query-wrangler&edit='.$wp_query->query_wrangler['query_id'],
+      'parent' => false, // false for a root menu, pass the ID value for a submenu of that menu.
+      'id' => 'edit', // defaults to a sanitized title value.
+      'meta' => false // array of any of the following options: array( 'html' => '', 'class' => '', 'onclick' => '', target => '', title => '' );
+    );
+
+    $wp_admin_bar->remove_menu('edit');
+    $wp_admin_bar->add_menu($edit_query);
+  }
+}
 
 /*
  * Handle Query pages
@@ -93,7 +137,7 @@ function qw_query_pages_handler()
   global $wp_query,$wpdb;
   $handled_ops = array('category', 'tag', 'tax', '404', 'single');
 
-  // page op is based on WP tags like is_category() && is_404()
+  // page op is based on WP Conditional tags like is_category() && is_404()
   $op = qw_get_page_op();
 
   // we only handle sepcific types of pages and overrides
@@ -105,9 +149,6 @@ function qw_query_pages_handler()
     // We'll need to override query options
     $options_override = array();
 
-    // Clean the result for DB
-    $path = $wpdb->escape($wp_query->query['pagename']);
-krumo($wp_query);
     // fix the query paging
     if($paged = qw_get_page_number($wp_query)){
       $wp_query->query_vars['paged'] = $paged;
@@ -118,13 +159,17 @@ krumo($wp_query);
      * 404 -> Query type = Page
      */
     if($op == '404'){
-      // take into account trailing slash
-      if(substr($path, strlen($path)-1, 1) == '/'){
-        $path = rtrim($path, '/');
-      }
+      // Clean the result for DB
+      $path = qw_get_path();
 
+      // take into account trailing slash
+      if(substr($path, strlen($path)-1, 1) != '/'){
+        $alt_path = $path.'/';
+      } else {
+        $alt_path = substr($path, 0, strlen($path)-1);
+      }
       // Look for the query path given
-      $sql = "SELECT id,name,path,data FROM ".$qw_table." WHERE type LIKE '%page%' AND path = '".$path."'";
+      $sql = "SELECT id,name,path,data FROM ".$qw_table." WHERE type LIKE '%page%' AND (path = '".$path."' OR path = '".$alt_path."')";
       $query = $wpdb->get_row($sql);
     }
 
@@ -156,6 +201,8 @@ krumo($wp_query);
     // got results for a query
     if (isset($query))
     {
+      add_action( 'wp_before_admin_bar_render', 'qw_before_admin_bar_render' );
+
 $_SESSION['qw']['time']['page_load']['start'] = microtime(1);
       // pass the paged value into the query
       $options_override['args']['paged'] = $paged;
@@ -171,6 +218,8 @@ $_SESSION['qw']['time']['page_load']['start'] = microtime(1);
       if($op == '404'){
         // The title of the query
         $post_title = ($options['display']['title']) ? $options['display']['title'] : $query->name;
+        // alter op to page for get_query_template()
+        $op = 'page';
       }
       else {
         // categories and tags use term name for title
@@ -213,7 +262,7 @@ $_SESSION['qw']['time']['page_template']['start'] = microtime(1);
       // chosen template path
       $template_path = TEMPLATEPATH."/".$options['display']['page']['template-file'];
       if(!file_exists($template_path)) {
-      	$template_path = TEMPLATEPATH."/".qw_default_template_file();
+      	 $template_path = get_query_template($op);
       }
 
       include($template_path);

@@ -33,6 +33,10 @@ $_SESSION['qw']['time']['execute']['start'] = microtime(1);
 // pre_render hook
   do_action_ref_array('qw_pre_render', array(&$options));
 
+  // store some other data
+  $wp_query->query_wrangler['query_id'] = $query_id;
+  $wp_query->query_wrangler['options'] = $options;
+
 $_SESSION['qw']['time']['execute']['end'] = microtime(1);
 $_SESSION['qw']['time']['template']['start'] = microtime(1);
 
