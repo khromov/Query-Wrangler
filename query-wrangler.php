@@ -168,8 +168,8 @@ function qw_init_admin(){
       // edit page & not on export page
       if(!empty($_GET['edit']) &&
          empty($_GET['export']))  {
-        qw_editors_init();
         add_action( 'admin_enqueue_scripts', 'qw_admin_js' );
+        qw_editors_init();
       }
 
       // list page

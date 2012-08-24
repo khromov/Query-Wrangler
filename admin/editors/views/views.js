@@ -48,7 +48,7 @@ QueryWrangler.get_handler_templates = function(handler, handler_hook, item_type)
   return next_name;
 }
 QueryWrangler.add_list_item = function(post_data_form){
-  
+
   var title = QueryWrangler.allHandlers[post_data_form.handler].all_items[post_data_form.hook_key].title;
 
   var output = "<div class='qw-query-title' title='qw-"+post_data_form.handler+"-"+post_data_form.name+"'>";

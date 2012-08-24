@@ -4,7 +4,6 @@ function qw_toggle_wizard_description(){
 
   // get value and show description
   var val = jQuery('#qw-data-wizard').val();
-  console.log(val);
   jQuery('p#wizard-'+val).show();
 }
 
