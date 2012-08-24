@@ -45,11 +45,6 @@ The easiest way is to add it as a custom link in the Menus section of your site.
 
 Easy, the code you're looking for is like this.   [query id=2] , where the number 2 is the query id.
 
-= What are overrides and how do I use them? =
-
-Overrides allow you to alter the display and information given on category and tag pages.
-For a simple example, add a new query and chose the type `override`.  Choose how you want the content to display, then examine the `Override Settings` options.
-Select a category or multiple categories to override.   Save the query, then visit that category page.
 
 == Screenshots ==
 
@@ -57,6 +52,27 @@ Select a category or multiple categories to override.   Save the query, then vis
 1. Tabs Editor Theme
 
 == Changelog ==
+= 1.6beta1 =
+
+ * Rewrite of a lot of core functionality
+ * New features: exposed filters, more fields, better taxonomy handling, dev API w/ examples
+
+= 1.5rc5 =
+
+ * Fix: bug, javascript sometimes enqueuing in wrong order (Google Libraries)
+
+= 1.5rc4 =
+
+ * Fix: bug, custom label and rewrite output fields not showing up.
+
+= 1.5rc3 =
+
+ * Fix: bug in looking for a query page's path
+
+= 1.5rc2 =
+
+ * Fix: meta field returning array
+ * Fix: page links missing starting slash
 
 = 1.5rc1 =
 

@@ -30,6 +30,12 @@ function qw_field_image_attachment_form($field)
            name='<?php print $field['form_prefix']; ?>[image_display_count]'
            value="<?php print ($field['values']['image_display_count']) ? $field['values']['image_display_count']: 0;?>" />
     <p class="description">Number of images to show.  Use 0 (zero) to show all attached images.</p>
+    <label class="qw-label">Starting item:</label>
+    <input class="qw-text-short qw-title-ignore"
+           type="text"
+           name='<?php print $field['form_prefix']; ?>[image_display_start]'
+           value="<?php print ($field['values']['image_display_start']) ? $field['values']['image_display_start']: 1;?>" />
+    <p class="description">Number representing the image to start with.</p>
     <div>
       <label class="qw-label">Image Display Style:</label>
       <select name='<?php print $field['form_prefix']; ?>[image_display_style]'>
@@ -51,22 +57,26 @@ function qw_field_image_attachment_form($field)
 /*
  * Turn a list of images into html
  *
- * @param $post_id
- * @param $image_type
- * @param $count;
+ * @param $post
+ * @param $field;
  */
 function qw_theme_image($post, $field)
 {
-  $style = $field['image_display_style'];
-  $count = $field['image_display_count'];
+  $style = $field['values']['image_display_style'];
+  $max_count = $field['values']['image_display_count'];
+  $start = $field['values']['image_display_start'];
 
   $images = qw_get_post_images($post->ID);
   if(is_array($images)){
     $output = '';
-    $i = 0;
+    $count = 0;
+    $i = 1;
     foreach($images as $image){
-      if($count == 0 || ($i < $count)){
-        $output.= wp_get_attachment_image($image->ID, $style);
+      if ($i >= $start){
+        if($max_count == 0 || ($count < $max_count)){
+          $count++;
+          $output.= wp_get_attachment_image($image->ID, $style);
+        }
       }
       $i++;
     }

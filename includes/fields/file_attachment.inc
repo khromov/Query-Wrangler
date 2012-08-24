@@ -52,6 +52,13 @@ function qw_field_file_attachment_form($field)
            name='<?php print $field['form_prefix']; ?>[file_display_count]'
            value="<?php print ($field['values']['file_display_count']) ? $field['values']['file_display_count']: 0;?>" />
     <p class="description">Number of files to show.  Use 0 (zero) to show all attached files.</p>
+    <label class="qw-label">Starting item:</label>
+    <input class="qw-text-short qw-title-ignore"
+           type="text"
+           name='<?php print $field['form_prefix']; ?>[file_display_start]'
+           value="<?php print ($field['values']['file_display_start']) ? $field['values']['file_display_start']: 1;?>" />
+    <p class="description">Number representing the file to start with.</p>
+
     <div>
       <label class="qw-label">File Display Style:</label>
       <select name='<?php print $field['form_prefix']; ?>[file_display_style]'>
@@ -77,32 +84,42 @@ function qw_field_file_attachment_form($field)
  * $param int $count Number of files to get
  */
 function qw_theme_file($post, $field){
-  $style = ($field['file_display_style']) ? $field['file_display_style'] : 'link';
-  $count = ($field['file_display_count']) ? $field['file_display_count'] : 0;
+  $style = ($field['values']['file_display_style']) ? $field['values']['file_display_style'] : 'link';
+  $max_count = ($field['values']['file_display_count']) ? $field['values']['file_display_count'] : 0;
+  $start = ($field['values']['file_display_start']) ? $field['values']['file_display_start'] : 1;
 
   $files = qw_get_post_files($post->ID);
   if(is_array($files))
   {
     $output = '';
-    $i=0;
+    $i = 1;
+    $count = 0;
     foreach($files as $file){
-      if(($count == 0 || ($i < $count)) && substr($file->post_mime_type,0,5) != "image")
-      {
-        switch($style){
-          case 'url':
-          $output .= wp_get_attachment_url($file->ID);
-          break;
+      // make sure we only output items after the 'start' number
+      if ($i >= $start){
+        // not images
+        if (substr($file->post_mime_type,0,5) != "image"){
+          // makesure we're less than the total items requested
+          if($max_count == 0 || ($count < $max_count))
+          {
+            switch($style){
+              case 'url':
+              $output .= '<div class="file-attachement">'.wp_get_attachment_url($file->ID).'</div>';
+              break;
 
-          case 'link':
-          // complete file name
-          $file_name = explode("/", $file->guid);
-          $file_name = $file_name[count($file_name)-1];
-          $output.= '<a href="'.wp_get_attachment_url($file->ID).'" class="query-file-link">'.$file_name.'</a>';
-          break;
+              case 'link':
+              // complete file name
+              $file_name = explode("/", $file->guid);
+              $file_name = $file_name[count($file_name)-1];
+              $output.= '<div class="file-attachement"><a href="'.wp_get_attachment_url($file->ID).'" class="query-file-link">'.$file_name.'</a></div>';
+              break;
 
-          case 'link_url':
-            $output.= '<a href="'.wp_get_attachment_url($file->ID).'" class="query-file-link">'.$file->guid.'</a>';
-            break;
+              case 'link_url':
+                $output.= '<div class="file-attachement"><a href="'.wp_get_attachment_url($file->ID).'" class="query-file-link">'.$file->guid.'</a></div>';
+                break;
+            }
+            $count++;
+          }
         }
       }
       $i++;

@@ -53,12 +53,24 @@ function qw_sorts_default($sort_options){
     'title' => 'Random',
     'description' => 'Random order.',
   );
+  $sort_options['meta_value'] = array(
+    'title' => 'Meta Value (string)',
+    'description' => 'Sort the query based on the value of a custom field.  Use this to sort with text.',
+    'query_args_callback' => 'qw_sort_meta_value_args_callback',
+    'form_callback' => 'qw_sort_meta_value_form_callback',
+  );
+  $sort_options['meta_value_num'] = array(
+    'title' => 'Meta Value (number)',
+    'description' => 'Sort the query based on the value of a custom field.  Use this to sort with numbers.',
+    'query_args_callback' => 'qw_sort_meta_value_args_callback',
+    'form_callback' => 'qw_sort_meta_value_form_callback',
+  );
   return $sort_options;
 }
 
 /*
  * Most sort options are just ASC and DESC, so we use a default
- * 
+ *
  * Default sort options 'order' options form
  */
 function qw_sorts_default_form_callback($sort)
@@ -79,4 +91,26 @@ function qw_sorts_default_form_callback($sort)
     </select>
     <p class="description">Select how to order the results.</p>
   <?php
+}
+/*
+ * Handle arguments for meta_value and meta_value_num sorting
+ */
+function qw_sort_meta_value_args_callback(&$args, $sort){
+  $args['meta_key'] = $sort['values']['meta_key'];
+  $args[$sort['orderby_key']] = $sort['type'];
+  $args[$sort['order_key']] = $sort['order_value'];
+}
+
+/*
+ *
+ */
+function qw_sort_meta_value_form_callback($sort)
+{ ?>
+    <label class="qw-label">Custom/Meta Field Key:</label>
+    <input name='<?php print $sort['form_prefix']; ?>[meta_key]'
+           type='text' size='20'
+           value='<?php print $sort['meta_key']; ?>' />
+    <p class="description">Type in the Custom Field key for the values you want to sort by.</p>
+  <?php
+    qw_sorts_default_form_callback($sort);
 }
