@@ -20,6 +20,8 @@ function qu_upgrade_12_to_current(){
  */
 function qw_upgrade_15_to_16()
 {
+  qw_query_overrides_table();
+
   // get all queries
   global $wpdb;
   $table = $wpdb->prefix."query_wrangler";
@@ -138,15 +140,19 @@ function qw_upgrade_15_to_16()
           }
 
           // [display][override] = [args][contextual_filters]
-          $new_filter['values'] = array(
-            'type' => $hook_key,
+          $new_filter = array(
+            'query_id' => $query->id,
             'hook_key' => $hook_key,
-            'name' => $hook_key,
-            'do_override' => 'on',
-            'context' => 'global_query',
-            'operator' => 'IN',
-            'terms' => array_pop($values),
-            'weight' => count($data['args']['contextual_filters']),
+            'values' => array(
+              'type' => $hook_key,
+              'hook_key' => $hook_key,
+              'name' => $hook_key,
+              'do_override' => 'on',
+              'context' => 'global_query',
+              'operator' => 'IN',
+              'terms' => $values,
+              'weight' => count($data['args']['contextual_filters']),
+            )
           );
 
           $data['args']['contextual_filters'][$new_filter['name']] = $new_filter;

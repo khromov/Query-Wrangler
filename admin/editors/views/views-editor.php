@@ -145,11 +145,20 @@
             <div id="existing-<?php print $type; ?>s">
               <?php
                 if (is_array($handler['items'])){
+                  // tokens for fields
+                  $tokens = array();
+
                   foreach($handler['items'] as $name => $item)
                   {
                     $args = array(
                       $type => $item,
                     );
+
+                    // if this is a field, add it's token and pass as template variable
+                    if ($handler['hook_key'] == 'field') {
+                      $tokens[] = '{{'.$item['name'].'}}';
+                      $args['tokens'] = $tokens;
+                    }
                     print theme('query_'.$type, $args);
                   }
                 }

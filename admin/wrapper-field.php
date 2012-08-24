@@ -33,7 +33,7 @@
       Remove
     </div>
     <input class='qw-weight'
-           name='<?php print $field['form_prefix']; ?>[<?php print $field['name']; ?>][weight]'
+           name='<?php print $field['form_prefix']; ?>[weight]'
            type='text' size='2'
            value='<?php print $field['weight']; ?>' />
 

@@ -140,7 +140,6 @@ function qw_preprocess_handlers($options){
         $this_item = $all[$hook_key];
 
         // copy type, hook_key, and weight to top level of array
-
         $this_item['name'] = $name;
         $this_item['type'] = $values['type'];
         $this_item['weight'] = $values['weight'];
@@ -156,11 +155,11 @@ function qw_preprocess_handlers($options){
         $handlers[$type]['items'][$name] = $this_item;
       }
     }
-  }
 
-  // sort sorts according to weight
-  if(is_array($handler['items'])){
-    uasort($handler['items'], 'qw_cmp');
+    // sort sorts according to weight
+    if(is_array($handlers[$type]['items'])){
+      uasort($handlers[$type]['items'], 'qw_cmp');
+    }
   }
 
   return $handlers;
@@ -203,6 +202,4 @@ function qw_handler_make_form(&$handler){
   else if (isset($handler['override_form_template'])){
     $handler['override_form'] = theme($handler['override_form_template'], array('this' => $handler));
   }
-//  krumo($handler['title'].' - '.$handler['hook_key']);
-//krumo($handler);
 }

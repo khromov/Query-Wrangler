@@ -257,13 +257,8 @@ function qw_make_fields_rows(&$wp_query, $options)
     if(is_array($display['fields']))
     {
       // loop through each field
-      foreach($display['fields'] as $field_name => $field_values)
+      foreach($display['fields'] as $field_name => $field)
       {
-        // get field details from all fields list
-        $field = $all_fields[$field_values['hook_key']];
-        // merge default data with values
-        $field['values'] = $field_values;
-
         // field open
         $field_classes = array('query-field');
         $field_classes[] = 'query-field-'.$field_name;
@@ -286,7 +281,7 @@ function qw_make_fields_rows(&$wp_query, $options)
         else {
           $rows[$i]['fields'][$field_name]['output'].= $this_post->{$field['values']['type']};
         }
-
+        
         // apply link to field
         if(isset($field['values']['link'])){
           $rows[$i]['fields'][$field_name]['output'] = '<a class="query-field-link" href="'.get_permalink().'">'.$rows[$i]['fields'][$field_name]['output'].'</a>';
