@@ -32,7 +32,7 @@ $args = "<pre>".print_r($args, true)."</pre>";
 // display
 $display = "<pre>".htmlentities(print_r($options['display'], true))."</pre>";
 
-$new_query = "<pre>".print_r($qp,true)."</pre>"."<pre>".print_r($wp_query,true)."</pre>";
+$new_query = "<pre>".print_r($wp_query,true)."</pre>";
 
 $templates = "These template files will be searched for relative to your theme folder.<br />
               To override a query's template, copy the corresponding template from the <span style='font-family: monospace;'>query-wrangler/templates</span> folder to your theme folder (or THEME/templates) and rename it.

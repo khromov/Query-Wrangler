@@ -79,13 +79,17 @@ function qw_template_scan($options)
   // template with wrapper
   $templates['wrapper'] = theme('query_display_wrapper', $wrapper_args, true);
 
+  $style_settings = array();
+  if (isset($options['display']['style_settings'][$style['hook_key']])){
+    $style_settings = $options['display']['style_settings'][$style['hook_key']];
+  }
   // setup row template arguments
   $template_args = array(
     'template' => $style['template'],
     'slug' => $slug,
     'type' => $options['display']['types']['this_instance'],
     'style' => $style['hook_key'],
-    'style_settings' => $options['display']['style_settings'][$style['hook_key']],
+    'style_settings' => $style_settings,
     'tw_action' => 'find_only',
   );
   // template the query rows

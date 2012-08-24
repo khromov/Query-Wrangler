@@ -32,7 +32,7 @@ function theme($template_name = '', $arguments = array())
     $template['name'] = $template_name;
 
     // if not arguments array given, make empty array for future actions
-    if(!is_array($template['arguments'])){
+    if(!isset($template['arguments']) || !is_array($template['arguments'])){
       $template['arguments'] = array();
     }
 
@@ -47,7 +47,7 @@ function theme($template_name = '', $arguments = array())
     tw_find_template(&$template);
 
     // for other means of processing or information
-    if ($template['arguments']['tw_action'] == 'find_only'){
+    if (isset($template['arguments']['tw_action']) && $template['arguments']['tw_action'] == 'find_only'){
       return $template;
     }
 

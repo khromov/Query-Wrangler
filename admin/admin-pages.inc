@@ -55,7 +55,7 @@ function qw_edit_json(){
     'allContextualFilters' => $handlers['contextual_filter']['all_items'],
     'allStyles' => qw_all_styles(),
     'allRowStyles' => qw_all_row_styles(),
-    'allPostTypes' => qw_all_post_types,
+    'allPostTypes' => qw_all_post_types(),
     'allPagerTypes' => qw_all_pager_types(),
     'allImageSizes' => get_intermediate_image_sizes(),
     'allFileStyles' => qw_all_file_styles(),
@@ -127,13 +127,13 @@ function qw_page_handler(){
   // see if we're editng a page
   if(isset($_GET['edit']) &&
      is_numeric($_GET['edit']) &&
-     !$redirect)
+     !isset($redirect))
   {
     // show edit form
     qw_edit_query_form();
   }
   // export a query
-  else if ($_GET['export'] && is_numeric($_GET['export'])){
+  else if (isset($_GET['export']) && is_numeric($_GET['export'])){
     qw_export_page();
   }
   // else we need a list of queries

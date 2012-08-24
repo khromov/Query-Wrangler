@@ -128,8 +128,8 @@ function qw_upgrade_15_to_16()
 
     // OVERRIDES = CONTEXT FILTER
     if ($query->type == 'override'){
-      if (is_array($data['display']['override'])){
-        foreach($data['display']['override'] as $type => $values)
+      if (is_array($data['override'])){
+        foreach($data['override'] as $type => $values)
         {
           if($type == 'tags'){
             $hook_key = 'taxonomy_post_tag';
@@ -138,14 +138,14 @@ function qw_upgrade_15_to_16()
           }
 
           // [display][override] = [args][contextual_filters]
-          $new_filter = array(
+          $new_filter['values'] = array(
             'type' => $hook_key,
             'hook_key' => $hook_key,
             'name' => $hook_key,
             'do_override' => 'on',
             'context' => 'global_query',
             'operator' => 'IN',
-            'terms' => $values,
+            'terms' => array_pop($values),
             'weight' => count($data['args']['contextual_filters']),
           );
 
@@ -155,7 +155,7 @@ function qw_upgrade_15_to_16()
           qw_contextual_filter_taxonomies_query_update($new_filter);
         }
         // remove the old override data
-        unset($data['display']['override']);
+        unset($data['override']);
       }
     }
 
@@ -175,9 +175,8 @@ function qw_upgrade_15_to_16()
     );
     $wpdb->update($table, $update, $where);
   }
-
   // drop old override table
-  //$wpdb->query("DROP TABLE `".$wpdb->prefix."query_override_terms`");
+  $wpdb->query("DROP TABLE `".$wpdb->prefix."query_override_terms`");
 }
 /*
  * Upgrade from 1.4 to 1.5

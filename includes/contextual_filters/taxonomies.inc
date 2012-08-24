@@ -41,7 +41,7 @@ function qw_contextual_filter_taxonomies($contextual_filters){
  * Convert contextual values into query args
  */
 function qw_contextual_filter_taxonomies_args(&$args, $contextual_filter){
-  if (!is_array($args['tax_query'])){
+  if (!isset($args['tax_query']) || !is_array($args['tax_query'])){
     $args['tax_query'] = array();
   }
 
@@ -115,8 +115,10 @@ function qw_contextual_filter_taxonomies_override_id($contextual_filter){
  */
 function qw_contextual_filter_taxonomies_query_update($contextual_filter){
   // save items to db table if not exists.
-  $new_values = array_keys($contextual_filter['values']['terms']);
-  qw_update_override_values($contextual_filter, $new_values);
+  if (isset($contextual_filter['values']['terms']) && is_array($contextual_filter['values']['terms'])){
+    $new_values = array_keys($contextual_filter['values']['terms']);
+    qw_update_override_values($contextual_filter, $new_values);
+  }
 }
 
 /*

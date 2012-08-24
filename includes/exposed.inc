@@ -43,7 +43,7 @@ function qw_process_exposed_handlers($options){
     $all_sorts = qw_all_sort_options();
     $exposed_sorts = array();
     foreach($options['args']['sorts'] as $name => $sort) {
-      if ($sort['is_exposed']){
+      if (isset($sort['is_exposed'])){
         $exposed_sorts[$name] = $all_sorts[$sort['hook_key']];
         // override exposed_key
         if (!empty($sort['exposed_key'])) {
@@ -57,7 +57,7 @@ function qw_process_exposed_handlers($options){
     $exposed_filters = array();
     $all_filters = qw_all_filters();
     foreach($options['args']['filters'] as $name => $filter) {
-      if ($filter['is_exposed']){
+      if (isset($filter['is_exposed'])){
         $exposed_filters[$name] = $all_filters[$filter['hook_key']];
         // override exposed_key
         if (!empty($filter['exposed_key'])) {

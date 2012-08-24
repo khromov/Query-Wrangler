@@ -16,7 +16,7 @@ function qw_remove_page_from_query_string($query_string)
     $query_string['paged'] = qw_get_page_number($wp_query);
   }
   // fix categories
-  if ($query_string['name'] == 'page' && isset($query_string['page'])) {
+  if (isset($query_string['page']) && isset($query_string['name']) && $query_string['name'] == 'page') {
       unset($query_string['name']);
       unset($query_string['page']);
   }
@@ -99,7 +99,7 @@ function qw_get_path(){
 
   // Clean the result for DB
   $path = $wpdb->escape(ltrim($path,'/'));
-  
+
   return $path;
 }
 
@@ -210,10 +210,8 @@ $_SESSION['qw']['time']['page_load']['start'] = microtime(1);
 
       // actual options
       $options = qw_unserialize($query->data);
-
       // resulting query
       $themed_query = qw_execute_query($query->id, $options_override, false);
-
       // post title
       if($op == '404'){
         // The title of the query
@@ -223,7 +221,9 @@ $_SESSION['qw']['time']['page_load']['start'] = microtime(1);
       }
       else {
         // categories and tags use term name for title
-        $post_title = $term->name;
+        if ($term = qw_get_term($override_id)){
+          $post_title = $term->name;
+        }
       }
 
       // remove the autop filter to prevent paragraph randomly being added

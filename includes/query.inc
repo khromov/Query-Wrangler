@@ -15,13 +15,16 @@ $_SESSION['qw']['time']['execute']['start'] = microtime(1);
   // backup the old query
   $original_query = $wp_query;
 
+  // retain our global query throughout
+  $wp_query->original_wp_query = $original_query;
+
   // get the query options
   $options = qw_generate_query_options($query_id, $options_override);
 
   // get formatted query arguments
   $args = qw_generate_query_args($options);
 
-// pre_query hook
+  // pre_query hook
   do_action_ref_array('qw_pre_query', array(&$args));
 
   // set the new query
@@ -30,7 +33,7 @@ $_SESSION['qw']['time']['execute']['start'] = microtime(1);
   // retain our global query throughout
   $wp_query->original_wp_query = $original_query;
 
-// pre_render hook
+  // pre_render hook
   do_action_ref_array('qw_pre_render', array(&$options));
 
   // store some other data
@@ -42,7 +45,6 @@ $_SESSION['qw']['time']['template']['start'] = microtime(1);
 
   // get the themed content
   $themed = qw_template_query($wp_query, $options);
-
 $_SESSION['qw']['time']['template']['end'] = microtime(1);
 
   // Reset Post Data
@@ -116,7 +118,6 @@ function qw_generate_query_args($options = array(), $options_override = array())
 {
   // combine options
   $options =  array_merge_recursive((array)$options, $options_override);
-
   $handlers = qw_preprocess_handlers($options);
 
   // standard arguments
@@ -127,7 +128,8 @@ function qw_generate_query_args($options = array(), $options_override = array())
 
   $submitted_data = qw_exposed_submitted_data();
 
-  foreach ($handlers as $handler_type => $handler){
+  foreach ($handlers as $handler_type => $handler)
+  {
     if (is_array($handler['items'])){
       foreach($handler['items'] as $name => $item)
       {
@@ -155,7 +157,7 @@ function qw_generate_query_args($options = array(), $options_override = array())
 
         // Process submitted exposed values
         // exposed items
-        if(isset($item['exposed_process']) && function_exists($item['exposed_process'])){
+        if(isset($item['values']['is_exposed']) && function_exists($item['exposed_process'])){
           $value = $submitted_data[$item['exposed_key']];
           $item['exposed_process']($args, $item, $value);
         }

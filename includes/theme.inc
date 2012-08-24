@@ -121,13 +121,17 @@ function qw_template_query(&$wp_query, $options)
   // look for empty results
   if ($results_count > 0)
   {
+    $style_settings = array();
+    if (isset($options['display']['style_settings'][$options['meta']['style']])){
+      $style_settings = $options['display']['style_settings'][$options['meta']['style']];
+    }
     // setup row template arguments
     $template_args = array(
       'template' => $options['meta']['template'],
       'type' => $options['meta']['type'],
       'slug' => $options['meta']['slug'],
       'style' => $options['meta']['style'],
-      'style_settings' => $options['display']['style_settings'][$options['meta']['style']],
+      'style_settings' => $style_settings,
       'options' => $options,
     );
     // the content of the widget is the result of the query
@@ -194,6 +198,7 @@ function qw_make_posts_rows(&$wp_query, $options){
   while($wp_query->have_posts())
   {
     $wp_query->the_post();
+
     $template_args = array(
       'template' => 'query-'.$row_style_settings['size'],
       'slug' => $options['meta']['slug'],

@@ -9,7 +9,7 @@ Plugin URI:        http://www.widgetwrangler.com/query-wrangler
 Description:       Query Wrangler provides an intuitive interface for creating complex WP queries as pages or widgets. Based on Drupal Views.
 Author:            Jonathan Daggerhart, Forrest Livengood
 Author URI:        http://www.websmiths.co
-Version:           1.5rc1
+Version:           1.6
 
 ******************************************************************
 
@@ -163,22 +163,24 @@ function qw_init_admin(){
   add_action( 'wp_ajax_qw_form_ajax', 'qw_form_ajax' );
 
   // js
-  if($_GET['page'] == 'query-wrangler'){
-    // edit page & not on export page
-    if(!empty($_GET['edit']) &&
-       empty($_GET['export']))  {
-      qw_editors_init();
-      add_action( 'admin_enqueue_scripts', 'qw_admin_js' );
+  if (isset($_GET['page'])){
+    if($_GET['page'] == 'query-wrangler'){
+      // edit page & not on export page
+      if(!empty($_GET['edit']) &&
+         empty($_GET['export']))  {
+        qw_editors_init();
+        add_action( 'admin_enqueue_scripts', 'qw_admin_js' );
+      }
+
+      // list page
+      if(empty($_GET['edit'])){
+        add_action( 'admin_enqueue_scripts', 'qw_admin_list_js' );
+      }
     }
 
-    // list page
-    if(empty($_GET['edit'])){
-      add_action( 'admin_enqueue_scripts', 'qw_admin_list_js' );
+    if($_GET['page'] == 'qw-create'){
+      add_action( 'admin_enqueue_scripts', 'qw_admin_create_js' );
     }
-  }
-
-  if($_GET['page'] == 'qw-create'){
-    add_action( 'admin_enqueue_scripts', 'qw_admin_create_js' );
   }
 }
 

@@ -311,7 +311,7 @@ class Query_Wrangler_List_Table extends WP_List_Table
          * use sort and pagination data to build a custom query instead, as you'll
          * be able to use your precisely-queried data immediately.
          */
-        $data = $this->example_data;
+        //$data = $this->example_data;
 
 
         /**
@@ -411,7 +411,7 @@ function qw_list_queries_form(){
     $ListTable->prepare_items();
 
     // if noheader is set, then we're bulk operating
-    if(!$_REQUEST['noheader']){
+    if(!isset($_REQUEST['noheader'])){
       ?>
       <div class="wrap">
 

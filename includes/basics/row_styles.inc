@@ -1,9 +1,9 @@
 <?php
 // hook into qw_basics
 add_filter('qw_basics', 'qw_basic_settings_row_style');
-// add default field styles to the filter
+// add default row styles to the filter
 add_filter('qw_row_styles', 'qw_row_styles_default', 0);
-// add default field styles to the filter
+// add default row complete styles to the filter
 add_filter('qw_row_complete_styles', 'qw_row_complete_styles_default');
 // add default field styles to the filter
 add_filter('qw_row_fields_styles', 'qw_row_fields_styles_default');
@@ -32,6 +32,7 @@ function qw_row_styles_default($row_styles){
   );
   $row_styles['fields'] = array(
     'title' => 'Fields',
+    'settings_callback' => 'qw_basic_settings_row_styles_fields_settings',
   );
   return $row_styles;
 }
@@ -122,5 +123,14 @@ function qw_basic_settings_row_styles_posts_settings($row_style)
         Excerpt
       </option>
     </select>
+  <?php
+}
+/*
+ * Field row style settings form
+ */
+function qw_basic_settings_row_styles_fields_settings($field_style)
+{ ?>
+  <p>No settings for fields.</p>
+  <input type="hidden" name="<?php print $field_style['form_prefix']; ?>[placeholder]" value="none" />
   <?php
 }

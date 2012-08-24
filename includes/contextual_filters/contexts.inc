@@ -37,3 +37,4 @@ looks for the relavent information in the global WP_Query
 
 - Taxonomies CF pulls in info from th global WP_Query, and passes it along to this query
 - Post Parent CF pulls in post_parent of global WP_Query, and alters this query
+*/

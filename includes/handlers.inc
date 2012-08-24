@@ -86,16 +86,24 @@ function qw_handlers_templates($templates){
  * Simple functions for getting handler data from the query options
  */
 function qw_handler_field_data($options) {
-  return $options['display']['fields'];
+  if (isset($options['display']['fields'])){
+    return $options['display']['fields'];
+  }
 }
 function qw_handler_sort_data($options){
-  return $options['args']['sorts'];
+  if (isset($options['args']['sorts'])){
+    return $options['args']['sorts'];
+  }
 }
 function qw_handler_filter_data($options){
-  return $options['args']['filters'];
+  if (isset($options['args']['filters'])){
+    return $options['args']['filters'];
+  }
 }
 function qw_handler_contextual_filter_data($options){
-  return $options['args']['contextual_filters'];
+  if (isset($options['args']['contextual_filters'])){
+    return $options['args']['contextual_filters'];
+  }
 }
 
 /*
@@ -174,7 +182,7 @@ function qw_handler_make_form(&$handler){
   }
 
   // see if item has an exposed settings form
-  if (function_exists($handler['exposed_settings_form_callback'])) {
+  if (isset($handler['exposed_settings_form_callback']) && function_exists($handler['exposed_settings_form_callback'])) {
     ob_start();
       $handler['exposed_settings_form_callback']($handler);
     $handler['exposed_settings_form'] = ob_get_clean();
@@ -186,7 +194,7 @@ function qw_handler_make_form(&$handler){
 
   // Contextual Filter override form
   // see if item has an exposed settings form
-  if (function_exists($handler['override_form_callback'])) {
+  if (isset($handler['override_form_callback']) && function_exists($handler['override_form_callback'])) {
     ob_start();
       $handler['override_form_callback']($handler);
     $handler['override_form'] = ob_get_clean();

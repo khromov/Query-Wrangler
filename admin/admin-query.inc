@@ -89,7 +89,6 @@ function qw_update_query($submitted){
   }
 
   $query_id = $submitted['query-id'];
-
   $table_name = $wpdb->prefix."query_wrangler";
   $data = array(
     'type' => $type,
@@ -173,7 +172,7 @@ function qw_query_import($submitted){
 /*
  * Handle updating override ids for contextual filters
  */
-function qw_update_override_values($handler, $new_values){
+function qw_update_override_values($handler, $new_values = array()){
   global $wpdb;
   $table = $wpdb->prefix."query_overrides";
   $query_id = $handler['query_id'];

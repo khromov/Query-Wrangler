@@ -42,7 +42,8 @@ function qw_filter_taxonomies_args(&$args, $filter){
   if (!is_array($args['tax_query'])){
     $args['tax_query'] = array();
   }
-
+//krumo('tax filter args');//krumo($args);
+////krumo($filter);
   if (is_array($filter['values']['terms'])){
     $include_children = (isset($filter['values']['include_children'])) ? true : false;
 
@@ -54,6 +55,8 @@ function qw_filter_taxonomies_args(&$args, $filter){
       'include_children' => $include_children,
     );
   }
+
+//krumo($args);//krumo('end tax filter args');
 }
 
 /*
@@ -174,7 +177,7 @@ function qw_filter_taxonomies_exposed_form_terms_checkboxes($filter, $terms)
       $filter['values']['terms'] = array($values => $values);
     }
   }
-  
+
   qw_filter_taxonomies_exposed_limit_values($filter, $terms);
   ?>
   <div class="query-checkboxes">
