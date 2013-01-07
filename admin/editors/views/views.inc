@@ -60,10 +60,12 @@ function qw_editors_views_js(){
   // my js script
   wp_enqueue_script('qw-edit-theme-views',
                   plugins_url('views.js', __FILE__ ),
-                  array('jquery-ui-core',
+                  array('qw-admin-js',
+                        'jquery-ui-core',
                         'jquery-ui-sortable',
                         'jquery-ui-tabs',
                         'jquery-ui-accordion',
-                        'jquery-ui-dialog'),
-                  QW_VERSION);
+                        'jquery-ui-dialog',
+                  ),
+                  QW_VERSION, true);
 }

@@ -137,19 +137,21 @@ QueryWrangler.add_item = function(dialog){
       }
   });
   QueryWrangler.theme_accordions();
-  jQuery(dialog).dialog('close');
+  //jQuery(dialog).dialog('close');
 }
 
 QueryWrangler.theme_accordions = function(){
-  jQuery('#display-style-settings, #row-style-settings, .qw-sortable-list')
-    .accordion('destroy');
+  if (jQuery('#display-style-settings, #row-style-settings, .qw-sortable-list').hasClass('is-accordion')){
+    jQuery('#display-style-settings, #row-style-settings, .qw-sortable-list')
+      .accordion('destroy');
+  }
   jQuery('#display-style-settings, #row-style-settings, .qw-sortable-list')
     .accordion({
       header: '> div > .qw-setting-header',
       collapsible: true,
       active: false,
       autoHeight: false
-  });
+  }).addClass('is-accordion');
 }
 
 QueryWrangler.toggle_empty_lists = function(){
@@ -202,7 +204,7 @@ QueryWrangler.button_update = function(dialog){
     QueryWrangler.changes = true;
     jQuery('.qw-changes').show();
   }
-  jQuery(this).dialog('close');
+  //jQuery(this).dialog('close');
 }
 /*
  * Cancel button
@@ -213,7 +215,7 @@ QueryWrangler.button_cancel = function(){
     jQuery('form#qw-edit-query-form').unserializeForm(QueryWrangler.form_backup);
   }
 
-  jQuery(this).dialog('close');
+  //jQuery(this).dialog('close');
 }
 QueryWrangler.sortable_list_build = function(element){
   QueryWrangler.current_form_id = jQuery(element).closest('.qw-query-admin-options').attr('id');

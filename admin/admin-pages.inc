@@ -10,26 +10,27 @@ function qw_admin_list_js(){
   wp_enqueue_script('qw-admin-list-js',
                   plugins_url('/admin/js/query-wrangler-list.js', dirname(__FILE__)),
                   array(),
-                  QW_VERSION);
+                  QW_VERSION,true);
 }
 // admin create page
 function qw_admin_create_js(){
   wp_enqueue_script('qw-admin-create-js',
                   plugins_url('/admin/js/query-wrangler-create.js', dirname(__FILE__)),
                   array(),
-                  QW_VERSION);
+                  QW_VERSION, true);
 }
 // Base JS
 function qw_admin_js(){
+  print 'a';
   wp_enqueue_script('qw-admin-js',
                   plugins_url('/admin/js/query-wrangler.js', dirname(__FILE__)),
-                  array('jquery-ui-core'),
-                  QW_VERSION);
+                  array('jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-dialog', 'jquery-ui-accordion'),
+                  QW_VERSION, true);
   // jquery unserialize form
   wp_enqueue_script('qw-unserialize-form',
                   plugins_url('/admin/js/jquery.unserialize-form.js', dirname(__FILE__)),
                   array(),
-                  QW_VERSION);
+                  QW_VERSION, true);
   $data = qw_edit_json();
   wp_localize_script( 'qw-admin-js',
                       'QueryWrangler',

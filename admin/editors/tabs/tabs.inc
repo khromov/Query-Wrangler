@@ -69,5 +69,5 @@ function qw_editors_tabs_js(){
                         'jquery-ui-tabs',
                         'jquery-ui-accordion',
                         'jquery-ui-dialog'),
-                  QW_VERSION);
+                  QW_VERSION, true);
 }
